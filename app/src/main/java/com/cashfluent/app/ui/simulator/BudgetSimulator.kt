@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,9 +25,9 @@ import com.cashfluent.app.ui.theme.CashfluentTheme
 fun BudgetSimulator(currency: Currency, modifier: Modifier = Modifier) {
     val colors = CashfluentTheme.colors
 
-    var income by rememberSaveable { mutableFloatStateOf(1_200f) }
-    var needs by rememberSaveable { mutableFloatStateOf(670f) }
-    var wants by rememberSaveable { mutableFloatStateOf(390f) }
+    var income by rememberSaveable { mutableStateOf(1_200f) }
+    var needs by rememberSaveable { mutableStateOf(670f) }
+    var wants by rememberSaveable { mutableStateOf(390f) }
 
     val net = income.toDouble()
     val actual = Budget.actual(net, needs.toDouble(), wants.toDouble())
@@ -71,10 +71,12 @@ fun BudgetSimulator(currency: Currency, modifier: Modifier = Modifier) {
         )
 
         StackedBar(
+            // Green means what you keep, so it belongs to the future bucket — not to
+            // rent. Needs are neutral: they are simply what life costs.
             parts = listOf(
-                BarPart("Needs", needs, colors.grow),
+                BarPart("Needs", needs, colors.lineStrong),
                 BarPart("Wants", wants, colors.gold),
-                BarPart("Future", actual.future.toFloat().coerceAtLeast(0f), colors.growSoft),
+                BarPart("Future", actual.future.toFloat().coerceAtLeast(0f), colors.grow),
             ),
             contentDescription = "Your month: needs ${Money.percent(shares.needs, 0)}, " +
                 "wants ${Money.percent(shares.wants, 0)}, " +

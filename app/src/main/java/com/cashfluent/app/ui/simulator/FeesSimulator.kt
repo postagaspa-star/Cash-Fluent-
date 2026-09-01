@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -24,10 +24,10 @@ import com.cashfluent.app.ui.theme.CashfluentTheme
 fun FeesSimulator(currency: Currency, modifier: Modifier = Modifier) {
     val colors = CashfluentTheme.colors
 
-    var monthly by rememberSaveable { mutableFloatStateOf(150f) }
-    var years by rememberSaveable { mutableFloatStateOf(30f) }
-    var gross by rememberSaveable { mutableFloatStateOf(7f) }
-    var ter by rememberSaveable { mutableFloatStateOf(1.2f) }
+    var monthly by rememberSaveable { mutableStateOf(150f) }
+    var years by rememberSaveable { mutableStateOf(30f) }
+    var gross by rememberSaveable { mutableStateOf(7f) }
+    var ter by rememberSaveable { mutableStateOf(1.2f) }
 
     val n = years.toInt()
     val yours = Fees.outcome(monthly.toDouble(), gross / 100.0, ter / 100.0, n)

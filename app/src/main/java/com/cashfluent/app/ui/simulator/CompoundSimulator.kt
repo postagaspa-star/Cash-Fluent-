@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -30,10 +30,10 @@ private const val HORIZON = 58
 fun CompoundSimulator(currency: Currency, modifier: Modifier = Modifier) {
     val colors = CashfluentTheme.colors
 
-    var monthly by rememberSaveable { mutableFloatStateOf(100f) }
-    var startAge by rememberSaveable { mutableFloatStateOf(18f) }
-    var stopAge by rememberSaveable { mutableFloatStateOf(28f) }
-    var rate by rememberSaveable { mutableFloatStateOf(7f) }
+    var monthly by rememberSaveable { mutableStateOf(100f) }
+    var startAge by rememberSaveable { mutableStateOf(18f) }
+    var stopAge by rememberSaveable { mutableStateOf(28f) }
+    var rate by rememberSaveable { mutableStateOf(7f) }
 
     // Dragging "stop" below "start" is easy to do by accident, so it is corrected rather
     // than rejected — the plan simply pays for zero months and says so.
@@ -49,7 +49,7 @@ fun CompoundSimulator(currency: Currency, modifier: Modifier = Modifier) {
     )
     val curve = plan.curve(HORIZON)
     val total = plan.valueAt(HORIZON)
-    val contributed = plan.totalContributed
+    val contributed = plan.contributedBy(HORIZON)
     val added = total - contributed
 
     SimulatorScaffold(

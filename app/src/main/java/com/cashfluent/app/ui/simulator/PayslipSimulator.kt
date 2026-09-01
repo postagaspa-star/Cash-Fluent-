@@ -12,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -37,8 +36,8 @@ private const val RAISE = 2_000.0
 fun PayslipSimulator(currency: Currency, modifier: Modifier = Modifier) {
     val colors = CashfluentTheme.colors
 
-    var gross by rememberSaveable { mutableFloatStateOf(24_000f) }
-    var contributionRate by rememberSaveable { mutableFloatStateOf(9f) }
+    var gross by rememberSaveable { mutableStateOf(24_000f) }
+    var contributionRate by rememberSaveable { mutableStateOf(9f) }
     var raiseTaken by rememberSaveable { mutableStateOf(false) }
 
     val rate = contributionRate / 100.0

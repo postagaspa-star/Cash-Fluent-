@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -26,11 +26,11 @@ import com.cashfluent.app.ui.theme.CashfluentTheme
 fun InflationSimulator(currency: Currency, modifier: Modifier = Modifier) {
     val colors = CashfluentTheme.colors
 
-    var amount by rememberSaveable { mutableFloatStateOf(3_000f) }
-    var years by rememberSaveable { mutableFloatStateOf(5f) }
-    var inflation by rememberSaveable { mutableFloatStateOf(3f) }
-    var accountRate by rememberSaveable { mutableFloatStateOf(0.5f) }
-    var investRate by rememberSaveable { mutableFloatStateOf(6f) }
+    var amount by rememberSaveable { mutableStateOf(3_000f) }
+    var years by rememberSaveable { mutableStateOf(5f) }
+    var inflation by rememberSaveable { mutableStateOf(3f) }
+    var accountRate by rememberSaveable { mutableStateOf(0.5f) }
+    var investRate by rememberSaveable { mutableStateOf(6f) }
 
     val n = years.toInt()
     val principal = amount.toDouble()

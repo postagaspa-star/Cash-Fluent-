@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -27,9 +27,9 @@ import kotlin.math.roundToInt
 fun DebtSimulator(currency: Currency, modifier: Modifier = Modifier) {
     val colors = CashfluentTheme.colors
 
-    var balance by rememberSaveable { mutableFloatStateOf(800f) }
-    var apr by rememberSaveable { mutableFloatStateOf(20f) }
-    var payment by rememberSaveable { mutableFloatStateOf(25f) }
+    var balance by rememberSaveable { mutableStateOf(800f) }
+    var apr by rememberSaveable { mutableStateOf(20f) }
+    var payment by rememberSaveable { mutableStateOf(25f) }
 
     val result = Debt.payoff(balance.toDouble(), apr / 100.0, payment.toDouble())
     val cleared = result as? Payoff.Clears

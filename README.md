@@ -37,16 +37,27 @@ investing basics, and how a payslip works.
 
 ## Status
 
-Infrastructure. The build, design system, data layer and the whole financial engine are in
-place and tested; the screens are being built on top.
+The app is complete and building. Six modules, six simulators, four screens.
 
 - [x] Gradle build, Android manifest, resources
 - [x] Design system — semantic colour, type scale, light and dark
 - [x] Local persistence (DataStore) for progress and settings
 - [x] Financial engine — six calculators, 48 unit tests
-- [ ] Home, module, settings and about screens
-- [ ] Module content
-- [ ] Simulators and quick checks
+- [x] All six modules of content, with a content integrity test
+- [x] Home, module, settings and about screens
+- [x] Six interactive simulators with hand-drawn charts
+- [ ] Bundled Archivo and IBM Plex Mono (the type scale is already in place)
+- [ ] Accessibility pass on a real device at 200% text size
+- [ ] App icon — currently a marked placeholder
+
+## Install it
+
+Every push builds a debug APK on CI. Open the most recent green run under
+[Actions](../../actions), and download the `cashfluent-apk` artifact at the bottom of the
+page. On your phone, open the `.apk` and allow installs from that source when asked.
+
+A tagged release (`v*`) also attaches the APK to a GitHub release, which is the link to
+hand to someone without a GitHub account.
 
 ## Build
 
