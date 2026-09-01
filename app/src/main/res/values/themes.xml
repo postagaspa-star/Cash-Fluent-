@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Cashfluent" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Paints the window before the first frame, so launching never flashes white. -->
+        <item name="android:windowBackground">@color/paper</item>
+    </style>
+</resources>

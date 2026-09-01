@@ -1,1 +1,90 @@
-# Prova-1-da-cambiare-
+# Cashfluent
+
+**The money class you never had.**
+
+A financial literacy tutor for 16–25 year olds, built for **GatewayHacks 2026** in the
+*Equity in Education* category. Android, Kotlin, Jetpack Compose.
+
+---
+
+## The problem
+
+Money skills are inherited, not taught. If someone at home talked about compound interest,
+about gross versus net, about what a fund quietly charges you every year, you start adult
+life roughly a decade ahead. If nobody did, you learn the same things by making expensive
+mistakes — and school mostly doesn't close that gap.
+
+Existing apps miss this reader in three specific ways. Budget trackers assume you already
+have money to track. Quiz apps teach vocabulary instead of mechanisms: knowing what an ETF
+is doesn't tell you what a 1% yearly fee costs you over thirty years. And most of the rest
+is written by finance people, for finance people.
+
+## The method
+
+Every module arrives in the same three blocks, always in this order:
+
+| | |
+|---|---|
+| **① The idea** | Why it matters. No numbers at all. |
+| **② The mechanism** | The real formula, with every symbol named and given an example value. |
+| **③ Real numbers** | A worked example with realistic figures, then the same calculation with *your* numbers. |
+
+Then a short check with an explanation of why the right answer is right, and one concrete
+thing to actually do this week.
+
+Six core modules: budgeting, compound interest, good vs bad debt, saving vs investing,
+investing basics, and how a payslip works.
+
+## Status
+
+Infrastructure. The build, design system, data layer and the whole financial engine are in
+place and tested; the screens are being built on top.
+
+- [x] Gradle build, Android manifest, resources
+- [x] Design system — semantic colour, type scale, light and dark
+- [x] Local persistence (DataStore) for progress and settings
+- [x] Financial engine — six calculators, 48 unit tests
+- [ ] Home, module, settings and about screens
+- [ ] Module content
+- [ ] Simulators and quick checks
+
+## Build
+
+Requires Android Studio (Ladybug or newer) and JDK 17.
+
+```bash
+./gradlew assembleDebug     # build
+./gradlew testDebugUnitTest # run the financial engine tests
+```
+
+## What's inside
+
+```
+app/src/main/java/com/cashfluent/app/
+├── data/            DataStore repositories — progress and settings
+├── di/              a twelve-line service locator, no DI framework
+├── domain/finance/  the calculators: pure Kotlin, no Android imports
+└── ui/              theme, navigation, screens
+```
+
+The calculators carry no Android dependency on purpose, so the numbers on screen are
+covered by unit tests that run in about a second.
+
+## Deliberately absent
+
+No account. No ads. No tracking. **No `INTERNET` permission** — there is no server to send
+anything to, and the manifest is the proof. Everything works offline, which is the point:
+equity means the person with a cheap phone and unreliable wifi opens the same app.
+
+Material You dynamic colour is also off. Green means *what you keep* and clay means *what
+it costs you* throughout the app; letting the system swap those hues would delete the
+meaning along with them.
+
+## A note on the numbers
+
+Every figure in the worked examples is computed, not estimated, and pinned by a unit test.
+Tax and contribution rates are **simplified and illustrative** — they show how the machine
+works, not any particular country's rules, and the app says so on screen every time they
+appear.
+
+Educational content. Not financial advice.
