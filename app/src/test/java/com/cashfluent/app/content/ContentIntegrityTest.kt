@@ -1,5 +1,7 @@
 package com.cashfluent.app.content
 
+import com.cashfluent.app.domain.finance.Currency
+import com.cashfluent.app.domain.finance.Money
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -121,6 +123,62 @@ class ContentIntegrityTest {
             "illustrative rates must say so on screen",
             withBands.single().mechanism.watchOut.contains("illustrative"),
         )
+    }
+
+    /**
+     * Every string a module can put on screen. Used by the placeholder tests below, and
+     * deliberately exhaustive: a field missing from here is a field nothing checks.
+     */
+    private fun Module.allStrings(): List<String> = buildList {
+        add(title); add(hook); add(takeaway); add(action)
+        addAll(idea.paragraphs); add(idea.whySchoolSkipsIt)
+        add(mechanism.intro); add(mechanism.plainEnglish); add(mechanism.watchOut)
+        addAll(mechanism.formulas); addAll(mechanism.steps)
+        mechanism.variables.forEach { add(it.symbol); add(it.name); add(it.meaning); add(it.example) }
+        mechanism.bands.forEach { add(it.range); add(it.rate) }
+        mechanism.bandsNote?.let { add(it) }
+        add(realNumbers.persona); add(realNumbers.punchline); add(realNumbers.realityCheck)
+        realNumbers.steps.forEach { add(it.text); it.math?.let { math -> add(math) } }
+        check.forEach { question ->
+            add(question.prompt); addAll(question.options)
+            add(question.why); add(question.whyNotOthers)
+        }
+    }
+
+    @Test
+    fun `asking for a module in a currency leaves no placeholder anywhere`() {
+        Currency.entries.forEach { currency ->
+            modules.forEach { module ->
+                module.inCurrency(currency).allStrings().forEach { text ->
+                    assertFalse(
+                        "unreplaced placeholder in ${module.id}: $text",
+                        text.contains(Money.CURRENCY_PLACEHOLDER),
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `titles and hooks carry no placeholder, because Home has no currency to apply`() {
+        modules.forEach { module ->
+            assertFalse(module.id, module.title.contains(Money.CURRENCY_PLACEHOLDER))
+            assertFalse(module.id, module.hook.contains(Money.CURRENCY_PLACEHOLDER))
+        }
+    }
+
+    @Test
+    fun `no module hard codes a currency symbol instead of the placeholder`() {
+        modules.forEach { module ->
+            module.allStrings().forEach { text ->
+                Currency.entries.forEach { currency ->
+                    assertFalse(
+                        "${module.id} hard codes ${currency.symbol}: $text",
+                        text.contains(currency.symbol),
+                    )
+                }
+            }
+        }
     }
 
     @Test

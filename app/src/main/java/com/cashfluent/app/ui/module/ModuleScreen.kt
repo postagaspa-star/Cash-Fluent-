@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cashfluent.app.content.Module
 import com.cashfluent.app.content.Modules
 import com.cashfluent.app.content.UiStrings
+import com.cashfluent.app.content.inCurrency
 import com.cashfluent.app.domain.finance.Currency
 import com.cashfluent.app.ui.components.BodyText
 import com.cashfluent.app.ui.components.Callout
@@ -71,7 +72,9 @@ fun ModuleScreen(
     val colors = CashfluentTheme.colors
     LaunchedEffect(moduleId) { viewModel.bind(moduleId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val module = state.module
+    // Every {c} in the module is replaced once, here. Nothing below this line has to
+    // remember to do it, and nothing below this line can forget.
+    val module = state.module?.inCurrency(state.currency)
 
     val listState = rememberLazyListState()
     val reached by remember {
