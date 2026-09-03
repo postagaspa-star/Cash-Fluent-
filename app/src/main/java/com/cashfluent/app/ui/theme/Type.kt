@@ -2,19 +2,27 @@ package com.cashfluent.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
+import com.cashfluent.app.R
 
 /*
- * The scale is the decision; the family is a swap.
+ * Two families, bundled with the app.
  *
- * Cashfluent is specified with Archivo for interface and IBM Plex Mono for numbers and
- * formulas. Those two font files are not bundled yet — dropping them into res/font/ and
- * changing [UiFamily] and [MonoFamily] below is the whole change, and nothing else in
- * the app has to move. Until then the platform families are used, which keeps every
- * size, weight and line height exactly as specified.
+ * Archivo carries the interface: a grotesque with a large x-height, so 17sp reading text
+ * stays readable on a cheap phone held at arm's length. IBM Plex Mono carries every digit
+ * and every formula, because a column of numbers that doesn't line up is a column you
+ * can't compare.
+ *
+ * They ship inside the APK rather than being fetched at runtime. That is not a detail:
+ * the app has no INTERNET permission, so anything it needs it has to already have.
+ *
+ * Static weights, one file each, not a variable font — a variable font's weight axis
+ * needs API 26, and this app runs from API 24 so it reaches the phones that were cheap
+ * five years ago. Licences for both are in licenses/ at the root of the repository.
  *
  * Two rules that are not negotiable, whatever the family:
  *   - reading text never goes below 17sp; this app is for people who find the subject
@@ -22,8 +30,18 @@ import androidx.compose.ui.unit.sp
  *   - anything with digits uses the monospace family, so columns of numbers line up.
  */
 
-private val UiFamily = FontFamily.SansSerif
-private val MonoFamily = FontFamily.Monospace
+private val UiFamily = FontFamily(
+    Font(R.font.archivo_regular, FontWeight.Normal),
+    Font(R.font.archivo_medium, FontWeight.Medium),
+    Font(R.font.archivo_semibold, FontWeight.SemiBold),
+    Font(R.font.archivo_bold, FontWeight.Bold),
+)
+
+private val MonoFamily = FontFamily(
+    Font(R.font.ibm_plex_mono_regular, FontWeight.Normal),
+    Font(R.font.ibm_plex_mono_medium, FontWeight.Medium),
+    Font(R.font.ibm_plex_mono_semibold, FontWeight.SemiBold),
+)
 
 private val TightLineHeight = LineHeightStyle(
     alignment = LineHeightStyle.Alignment.Center,

@@ -46,7 +46,7 @@ The app is complete and building. Six modules, six simulators, four screens.
 - [x] All six modules of content, with a content integrity test
 - [x] Home, module, settings and about screens
 - [x] Six interactive simulators with hand-drawn charts
-- [ ] Bundled Archivo and IBM Plex Mono (the type scale is already in place)
+- [x] Bundled Archivo and IBM Plex Mono, static weights, no runtime download
 - [ ] Accessibility pass on a real device at 200% text size
 - [ ] App icon — currently a marked placeholder
 

@@ -111,5 +111,8 @@ object AboutContent {
             "that you know the shape, they'll make sense.",
     )
 
+    const val TYPE_CREDIT =
+        "Set in Archivo and IBM Plex Mono, both under the SIL Open Font License 1.1."
+
     const val CREDIT = "Built for GatewayHacks 2026 · Equity in Education"
 }

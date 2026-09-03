@@ -104,11 +104,18 @@ fun AboutScreen(onBack: () -> Unit) {
 
             item {
                 Text(
-                    text = AboutContent.CREDIT,
+                    text = AboutContent.TYPE_CREDIT,
                     style = CashfluentType.dataSmall,
                     color = colors.muted,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                )
+                Text(
+                    text = AboutContent.CREDIT,
+                    style = CashfluentType.dataSmall,
+                    color = colors.muted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
             }
         }
