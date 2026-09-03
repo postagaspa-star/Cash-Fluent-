@@ -52,9 +52,14 @@ The app is complete and building. Six modules, six simulators, four screens.
 
 ## Install it
 
-Every push builds a debug APK on CI. Open the most recent green run under
-[Actions](../../actions), and download the `cashfluent-apk` artifact at the bottom of the
-page. On your phone, open the `.apk` and allow installs from that source when asked.
+Every push builds a debug APK on CI. Open the **most recent green run** under
+[Actions](../../actions) — not an older one — and download the `cashfluent-apk-<run>`
+artifact at the bottom of the page. On your phone, open the `.apk` and allow installs
+from that source when asked.
+
+To check which build you are actually running, open **Settings** in the app: the line at
+the bottom reads `Cashfluent 1.0.<run> (<commit>)`. It matches the run number in the
+Actions URL, so there is never any doubt about whether an update took.
 
 A tagged release (`v*`) also attaches the APK to a GitHub release, which is the link to
 hand to someone without a GitHub account.

@@ -1,5 +1,10 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+// CI passes the run number and the commit it built, so an installed APK can say
+// exactly which build it is. Locally these fall back to a "dev" label.
+val buildNumber = (project.findProperty("buildNumber") as String?)?.toIntOrNull() ?: 1
+val buildLabel = (project.findProperty("buildLabel") as String?) ?: "dev"
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,8 +21,8 @@ android {
         // about the price of the app.
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = buildNumber
+        versionName = "1.0.$buildNumber ($buildLabel)"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
     }
@@ -34,7 +39,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        // so the app can show which build it is
+        buildConfig = true
+    }
 
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
 }

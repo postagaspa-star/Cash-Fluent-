@@ -72,7 +72,7 @@ object UiStrings {
     const val PRIVACY_NOTE =
         "No account. No ads. No tracking. Nothing you type here leaves your phone — " +
             "there is no server to send it to."
-    const val VERSION = "Cashfluent 1.0 · GatewayHacks 2026"
+    fun version(build: String) = "Cashfluent $build · GatewayHacks 2026"
 }
 
 /** The About screen, which is also the clearest statement of what the project is for. */

@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cashfluent.app.BuildConfig
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.domain.finance.Currency
 import com.cashfluent.app.ui.components.SectionLabel
@@ -174,7 +175,7 @@ fun SettingsScreen(
 
             item {
                 Text(
-                    text = UiStrings.VERSION,
+                    text = UiStrings.version(BuildConfig.VERSION_NAME),
                     style = CashfluentType.dataSmall,
                     color = colors.muted,
                     textAlign = TextAlign.Center,
