@@ -13,8 +13,8 @@ import com.cashfluent.app.content.Variable
 val InflationModule = Module(
     id = "inflation",
     number = 4,
-    title = "Why cash quietly shrinks",
-    hook = "Same balance, less money",
+    title = "Saving vs investing",
+    hook = "Why money left in an account quietly buys less",
     minutes = 6,
     simulator = SimulatorKind.INFLATION,
 

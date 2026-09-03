@@ -13,8 +13,8 @@ import com.cashfluent.app.content.Variable
 val CompoundInterestModule = Module(
     id = "compound-interest",
     number = 2,
-    title = "Why time beats the amount",
-    hook = "Your years are worth more than your salary",
+    title = "Compound interest",
+    hook = "Why your years are worth more than your salary",
     minutes = 7,
     simulator = SimulatorKind.COMPOUND,
 

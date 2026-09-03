@@ -45,14 +45,7 @@ fun QuestionCard(
     val answered = selected != null
 
     Column(modifier = modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.Bottom) {
-            SectionLabel(UiStrings.SECTION_CHECK, modifier = Modifier.weight(1f))
-            Text(
-                text = UiStrings.questionProgress(index + 1, total),
-                style = CashfluentType.dataSmall,
-                color = colors.muted,
-            )
-        }
+        SubLabel("Question ${UiStrings.questionProgress(index + 1, total)}")
         Spacer(Modifier.height(12.dp))
 
         Text(

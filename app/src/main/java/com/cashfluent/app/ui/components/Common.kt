@@ -46,6 +46,41 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier, color: Color = Cas
     )
 }
 
+/**
+ * Starts a block with a rule above it. Without a boundary the three blocks run into one
+ * another and the whole lesson reads as one wall — which is exactly how it felt on a
+ * real phone.
+ */
+@Composable
+fun SectionHeader(
+    label: String,
+    modifier: Modifier = Modifier,
+    color: Color = CashfluentTheme.colors.grow,
+) {
+    val colors = CashfluentTheme.colors
+    Column(modifier = modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(colors.line),
+        )
+        Spacer(Modifier.height(22.dp))
+        SectionLabel(label, color = color)
+    }
+}
+
+/** A quieter label for grouping inside a block. */
+@Composable
+fun SubLabel(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text.uppercase(),
+        style = MaterialTheme.typography.labelSmall,
+        color = CashfluentTheme.colors.muted,
+        modifier = modifier,
+    )
+}
+
 @Composable
 fun BodyText(
     text: String,

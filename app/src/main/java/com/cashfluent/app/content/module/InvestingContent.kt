@@ -13,8 +13,8 @@ import com.cashfluent.app.content.Variable
 val InvestingModule = Module(
     id = "investing",
     number = 5,
-    title = "What you're actually buying",
-    hook = "A share is a slice of a real company",
+    title = "Shares and funds",
+    hook = "What you actually own, and what it costs you to own it",
     minutes = 8,
     simulator = SimulatorKind.FEES,
 

@@ -13,8 +13,8 @@ import com.cashfluent.app.content.Variable
 val BudgetingModule = Module(
     id = "budgeting",
     number = 1,
-    title = "Where your money actually goes",
-    hook = "It leaves in small pieces you never decided on",
+    title = "Budgeting",
+    hook = "Your money doesn't vanish. It leaves in pieces you never decided on",
     minutes = 6,
     simulator = SimulatorKind.BUDGET,
 

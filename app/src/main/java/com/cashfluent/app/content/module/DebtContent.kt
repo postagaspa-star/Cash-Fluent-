@@ -13,8 +13,8 @@ import com.cashfluent.app.content.Variable
 val DebtModule = Module(
     id = "debt",
     number = 3,
-    title = "What borrowing actually costs",
-    hook = "Debt isn't evil. Debt has a price",
+    title = "Good debt, bad debt",
+    hook = "Debt isn't evil. It has a price, and nobody shows you the tag",
     minutes = 7,
     simulator = SimulatorKind.DEBT,
 

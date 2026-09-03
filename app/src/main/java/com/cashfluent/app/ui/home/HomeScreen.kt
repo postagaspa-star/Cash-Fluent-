@@ -19,16 +19,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.data.model.ModuleStatus
 import com.cashfluent.app.ui.components.Pill
@@ -37,6 +38,14 @@ import com.cashfluent.app.ui.components.SectionLabel
 import com.cashfluent.app.ui.theme.CashfluentTheme
 import com.cashfluent.app.ui.theme.CashfluentType
 
+/**
+ * One thing to tap, then everything else.
+ *
+ * The first version gave six identical cards equal weight and put the heaviest element
+ * on screen — a saturated block explaining the method — above all of them. There was
+ * nowhere for the eye to land. Now the lesson you are actually on gets a large card with
+ * a real button, and the rest is a quiet list you scan rather than read.
+ */
 @Composable
 fun HomeScreen(
     onOpenModule: (String) -> Unit,
@@ -46,6 +55,7 @@ fun HomeScreen(
 ) {
     val colors = CashfluentTheme.colors
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val hero = state.rows.firstOrNull { it.isStartHere }
 
     Column(
         modifier = Modifier
@@ -53,8 +63,79 @@ fun HomeScreen(
             .background(colors.paper)
             .safeDrawingPadding(),
     ) {
-        // Words rather than icons: this app is for people who find the subject
-        // intimidating, and an unlabelled gear is one more thing to decode.
+        Header(
+            done = state.doneCount,
+            total = state.total,
+            fraction = state.fraction,
+            onOpenAbout = onOpenAbout,
+            onOpenSettings = onOpenSettings,
+        )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 40.dp),
+        ) {
+            if (state.showMethodCard) {
+                item {
+                    MethodStrip(onDismiss = viewModel::dismissMethodCard)
+                    Spacer(Modifier.height(28.dp))
+                }
+            }
+
+            if (hero != null) {
+                item {
+                    SectionLabel(
+                        text = if (hero.status == ModuleStatus.IN_PROGRESS) {
+                            UiStrings.SECTION_CONTINUE
+                        } else {
+                            UiStrings.SECTION_START
+                        },
+                        color = colors.goldInk,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    HeroCard(row = hero, onClick = { onOpenModule(hero.module.id) })
+                    Spacer(Modifier.height(32.dp))
+                }
+            } else {
+                item {
+                    AllDone()
+                    Spacer(Modifier.height(32.dp))
+                }
+            }
+
+            item {
+                SectionLabel(UiStrings.SECTION_ALL, color = colors.muted)
+                Spacer(Modifier.height(4.dp))
+            }
+
+            items(items = state.rows, key = { it.module.id }) { row ->
+                LessonRow(row = row, onClick = { onOpenModule(row.module.id) })
+                HorizontalDivider(color = colors.line)
+            }
+
+            item {
+                Text(
+                    text = UiStrings.DISCLAIMER,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.muted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 28.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Header(
+    done: Int,
+    total: Int,
+    fraction: Float,
+    onOpenAbout: () -> Unit,
+    onOpenSettings: () -> Unit,
+) {
+    val colors = CashfluentTheme.colors
+    Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -66,61 +147,19 @@ fun HomeScreen(
             TopAction(text = "Why", onClick = onOpenAbout)
             TopAction(text = UiStrings.SETTINGS, onClick = onOpenSettings)
         }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item {
-                Text(
-                    text = UiStrings.TAGLINE,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.muted,
-                )
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text(
-                        text = UiStrings.progress(state.doneCount, state.total),
-                        style = CashfluentType.dataSmall,
-                        color = colors.muted,
-                    )
-                    ProgressBar(state.fraction, modifier = Modifier.weight(1f))
-                }
-            }
-
-            if (state.showMethodCard) {
-                item { MethodCard(onDismiss = viewModel::dismissMethodCard) }
-            }
-
-            item {
-                SectionLabel(
-                    text = UiStrings.SECTION_CORE,
-                    color = colors.muted,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
-                )
-            }
-
-            items(items = state.rows, key = { it.module.id }) { row ->
-                ModuleCard(row = row, onClick = { onOpenModule(row.module.id) })
-            }
-
-            item {
-                Text(
-                    text = UiStrings.DISCLAIMER,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.muted,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
-                )
-            }
+            Text(
+                text = UiStrings.progress(done, total),
+                style = CashfluentType.dataSmall,
+                color = colors.muted,
+            )
+            ProgressBar(fraction, modifier = Modifier.weight(1f))
         }
+        HorizontalDivider(color = colors.line)
     }
 }
 
@@ -138,111 +177,166 @@ private fun TopAction(text: String, onClick: () -> Unit) {
     }
 }
 
+/** The one card on the screen that is meant to be tapped. */
 @Composable
-private fun MethodCard(onDismiss: () -> Unit) {
+private fun HeroCard(row: HomeModuleRow, onClick: () -> Unit) {
     val colors = CashfluentTheme.colors
+    val continuing = row.status == ModuleStatus.IN_PROGRESS
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colors.growSoft, RoundedCornerShape(14.dp))
-            .padding(16.dp),
+            .background(colors.surface, RoundedCornerShape(16.dp))
+            .border(1.dp, colors.line, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(20.dp),
     ) {
-        Text(
-            text = UiStrings.METHOD_TITLE,
-            style = MaterialTheme.typography.bodyMedium,
-            color = colors.growInk,
-        )
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            UiStrings.METHOD_CHIPS.forEach { chip ->
-                Text(
-                    text = chip,
-                    style = CashfluentType.dataSmall,
-                    color = colors.growInk,
-                    modifier = Modifier
-                        .background(colors.surface, RoundedCornerShape(6.dp))
-                        .padding(horizontal = 8.dp, vertical = 5.dp),
-                )
-            }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = row.module.displayNumber,
+                style = CashfluentType.dataSmall,
+                color = colors.goldInk,
+                modifier = Modifier
+                    .background(colors.goldSoft, RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 5.dp),
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = "${row.module.minutes} min",
+                style = CashfluentType.dataSmall,
+                color = colors.muted,
+            )
         }
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(14.dp))
+        Text(
+            text = row.module.title,
+            style = MaterialTheme.typography.titleLarge,
+            color = colors.ink,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = row.module.hook,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.muted,
+        )
+        Spacer(Modifier.height(20.dp))
         Box(
             modifier = Modifier
-                .align(Alignment.End)
-                .heightIn(min = 44.dp)
-                .clickable(onClick = onDismiss)
-                .padding(horizontal = 8.dp),
+                .fillMaxWidth()
+                .heightIn(min = 52.dp)
+                .background(colors.grow, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = UiStrings.METHOD_DISMISS,
+                text = if (continuing) UiStrings.ACTION_CONTINUE else UiStrings.ACTION_START,
                 style = MaterialTheme.typography.bodyMedium,
-                color = colors.growInk,
+                color = colors.paper,
             )
         }
     }
 }
 
 @Composable
-private fun ModuleCard(row: HomeModuleRow, onClick: () -> Unit) {
+private fun AllDone() {
     val colors = CashfluentTheme.colors
-    val highlighted = row.isStartHere
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.growSoft, RoundedCornerShape(16.dp))
+            .padding(20.dp),
+    ) {
+        Text(
+            text = UiStrings.ALL_DONE_TITLE,
+            style = MaterialTheme.typography.titleLarge,
+            color = colors.growInk,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = UiStrings.ALL_DONE_BODY,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.growInk,
+        )
+    }
+}
 
-    val badgeForeground = when {
-        highlighted -> colors.goldInk
-        row.status == ModuleStatus.DONE -> colors.growInk
-        else -> colors.muted
-    }
-    val badgeBackground = when {
-        highlighted -> colors.goldSoft
-        row.status == ModuleStatus.DONE -> colors.growSoft
-        else -> colors.surfaceAlt
-    }
+/** Quiet, scannable, one line each. Nothing here competes with the hero card. */
+@Composable
+private fun LessonRow(row: HomeModuleRow, onClick: () -> Unit) {
+    val colors = CashfluentTheme.colors
+    val done = row.status == ModuleStatus.DONE
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colors.surface, RoundedCornerShape(14.dp))
-            .border(
-                width = if (highlighted) 1.5.dp else 1.dp,
-                color = if (highlighted) colors.gold else colors.line,
-                shape = RoundedCornerShape(14.dp),
-            )
             .clickable(enabled = row.unlocked, onClick = onClick)
-            .padding(horizontal = 15.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         Text(
             text = row.module.displayNumber,
             style = CashfluentType.dataSmall,
-            color = badgeForeground,
-            modifier = Modifier
-                .background(badgeBackground, RoundedCornerShape(8.dp))
-                .padding(horizontal = 7.dp, vertical = 5.dp),
+            color = if (done) colors.grow else colors.muted,
+            modifier = Modifier.width(20.dp),
         )
-
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = row.module.title,
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (row.unlocked) colors.ink else colors.muted,
             )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = row.lockedBehind?.let { UiStrings.locked(it) } ?: row.module.hook,
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.muted,
-            )
+            if (row.lockedBehind != null) {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = UiStrings.locked(row.lockedBehind),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.muted,
+                )
+            }
         }
-
-        Spacer(Modifier.width(2.dp))
-
         when {
             !row.unlocked -> Pill("locked", colors.muted, colors.surfaceAlt)
-            highlighted -> Pill(UiStrings.BADGE_START_HERE.lowercase(), colors.goldInk, colors.goldSoft)
-            row.status == ModuleStatus.DONE -> Pill("done", colors.growInk, colors.growSoft)
-            row.status == ModuleStatus.IN_PROGRESS -> Pill("open", colors.muted, colors.surfaceAlt)
-            else -> Pill("new", colors.muted, colors.surfaceAlt)
+            done -> Pill("done", colors.growInk, colors.growSoft)
+            row.status == ModuleStatus.IN_PROGRESS -> Pill("open", colors.goldInk, colors.goldSoft)
+            else -> Spacer(Modifier.width(0.dp))
+        }
+    }
+}
+
+/** One quiet line. It explains the app once and then goes away for good. */
+@Composable
+private fun MethodStrip(onDismiss: () -> Unit) {
+    val colors = CashfluentTheme.colors
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.surfaceAlt, RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+    ) {
+        Text(
+            text = UiStrings.METHOD_TITLE,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.ink,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = UiStrings.METHOD_CHIPS.joinToString("   "),
+            style = CashfluentType.dataSmall,
+            color = colors.muted,
+        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.End)
+                .heightIn(min = 44.dp)
+                .clickable(onClick = onDismiss)
+                .padding(horizontal = 4.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = UiStrings.METHOD_DISMISS,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.grow,
+            )
         }
     }
 }

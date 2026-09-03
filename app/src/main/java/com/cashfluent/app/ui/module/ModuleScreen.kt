@@ -42,7 +42,9 @@ import com.cashfluent.app.ui.components.NumberedStep
 import com.cashfluent.app.ui.components.Pill
 import com.cashfluent.app.ui.components.Punchline
 import com.cashfluent.app.ui.components.QuestionCard
+import com.cashfluent.app.ui.components.SectionHeader
 import com.cashfluent.app.ui.components.SectionLabel
+import com.cashfluent.app.ui.components.SubLabel
 import com.cashfluent.app.ui.components.SectionProgress
 import com.cashfluent.app.ui.components.TopBar
 import com.cashfluent.app.ui.components.VariableRow
@@ -98,7 +100,7 @@ fun ModuleScreen(
             state = listState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 40.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp),
+            verticalArrangement = Arrangement.spacedBy(44.dp),
         ) {
             item { Hero(module) }
             item { IdeaBlock(module) }
@@ -160,8 +162,8 @@ private fun Hero(module: Module) {
 @Composable
 private fun IdeaBlock(module: Module) {
     val colors = CashfluentTheme.colors
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        SectionLabel(UiStrings.SECTION_IDEA)
+    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        SectionHeader(UiStrings.SECTION_IDEA)
         module.idea.paragraphs.forEach { BodyText(it) }
         Callout(
             label = UiStrings.WHY_SCHOOL,
@@ -177,8 +179,8 @@ private fun MechanismBlock(module: Module, currency: Currency) {
     val colors = CashfluentTheme.colors
     val mechanism = module.mechanism
 
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        SectionLabel(UiStrings.SECTION_MECHANISM)
+    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        SectionHeader(UiStrings.SECTION_MECHANISM)
         BodyText(mechanism.intro)
 
         mechanism.formulas.forEach { FormulaCard(it) }
@@ -197,7 +199,8 @@ private fun MechanismBlock(module: Module, currency: Currency) {
             modifier = Modifier.padding(top = 0.dp),
         )
 
-        Column {
+        SubLabel("What each symbol means")
+        Column(modifier = Modifier.padding(top = 4.dp)) {
             mechanism.variables.forEachIndexed { index, variable ->
                 VariableRow(variable, currency)
                 if (index != mechanism.variables.lastIndex) {
@@ -236,8 +239,8 @@ private fun MechanismBlock(module: Module, currency: Currency) {
             }
         }
 
-        SectionLabel(UiStrings.STEP_BY_STEP, color = colors.muted)
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SubLabel(UiStrings.STEP_BY_STEP)
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             mechanism.steps.forEachIndexed { index, step ->
                 NumberedStep(index + 1, step)
             }
@@ -257,8 +260,8 @@ private fun RealNumbersBlock(module: Module, currency: Currency) {
     val colors = CashfluentTheme.colors
     val real = module.realNumbers
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        SectionLabel(UiStrings.SECTION_REAL)
+    Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
+        SectionHeader(UiStrings.SECTION_REAL)
         Text(
             text = real.persona.withCurrency(currency),
             style = MaterialTheme.typography.bodyMedium,
@@ -268,7 +271,7 @@ private fun RealNumbersBlock(module: Module, currency: Currency) {
                 .background(colors.surfaceAlt, RoundedCornerShape(10.dp))
                 .padding(horizontal = 14.dp, vertical = 12.dp),
         )
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
             real.steps.forEachIndexed { index, step ->
                 WorkedStep(index + 1, step, currency)
             }
@@ -289,7 +292,8 @@ private fun CheckBlock(
     answers: Map<Int, Int>,
     onAnswer: (Int, Int) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(36.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(40.dp)) {
+        SectionHeader(UiStrings.SECTION_CHECK)
         module.check.forEachIndexed { index, question ->
             QuestionCard(
                 question = question,

@@ -14,8 +14,8 @@ import com.cashfluent.app.content.Variable
 val PayslipModule = Module(
     id = "payslip",
     number = 6,
-    title = "Gross vs net",
-    hook = "The ad's number isn't the one that arrives",
+    title = "Gross vs net pay",
+    hook = "Why the number in the job ad isn't the one that arrives",
     minutes = 7,
     simulator = SimulatorKind.PAYSLIP,
 
