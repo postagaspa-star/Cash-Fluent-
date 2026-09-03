@@ -15,10 +15,13 @@ class ContentIntegrityTest {
     private val modules = Modules.all
 
     @Test
-    fun `there are six core modules, numbered one to six in order`() {
-        assertEquals(6, Modules.core.size)
-        assertEquals((1..6).toList(), modules.map { it.number })
-        assertEquals(listOf("01", "02", "03", "04", "05", "06"), modules.map { it.displayNumber })
+    fun `there are ten core modules, numbered one to ten in order`() {
+        assertEquals(10, Modules.core.size)
+        assertEquals((1..10).toList(), modules.map { it.number })
+        assertEquals(
+            listOf("01", "02", "03", "04", "05", "06", "07", "08", "09", "10"),
+            modules.map { it.displayNumber },
+        )
     }
 
     @Test

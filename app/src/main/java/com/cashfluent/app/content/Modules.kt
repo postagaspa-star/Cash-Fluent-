@@ -2,10 +2,14 @@ package com.cashfluent.app.content
 
 import com.cashfluent.app.content.module.BudgetingModule
 import com.cashfluent.app.content.module.CompoundInterestModule
+import com.cashfluent.app.content.module.CreditRecordModule
 import com.cashfluent.app.content.module.DebtModule
 import com.cashfluent.app.content.module.InflationModule
+import com.cashfluent.app.content.module.InstalmentsModule
 import com.cashfluent.app.content.module.InvestingModule
 import com.cashfluent.app.content.module.PayslipModule
+import com.cashfluent.app.content.module.RentVsBuyModule
+import com.cashfluent.app.content.module.SideIncomeModule
 
 /**
  * The whole curriculum, in the order it is meant to be read. Everything is open by
@@ -20,6 +24,10 @@ object Modules {
         InflationModule,
         InvestingModule,
         PayslipModule,
+        InstalmentsModule,
+        CreditRecordModule,
+        SideIncomeModule,
+        RentVsBuyModule,
     )
 
     val all: List<Module> = core

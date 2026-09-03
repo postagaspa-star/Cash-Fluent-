@@ -31,6 +31,10 @@ fun SimulatorPanel(kind: SimulatorKind, currency: Currency, modifier: Modifier =
         SimulatorKind.INFLATION -> InflationSimulator(currency, modifier)
         SimulatorKind.FEES -> FeesSimulator(currency, modifier)
         SimulatorKind.PAYSLIP -> PayslipSimulator(currency, modifier)
+        SimulatorKind.INSTALMENTS -> InstalmentsSimulator(currency, modifier)
+        SimulatorKind.CREDIT -> CreditSimulator(currency, modifier)
+        SimulatorKind.SIDE_INCOME -> SideIncomeSimulator(currency, modifier)
+        SimulatorKind.MORTGAGE -> MortgageSimulator(currency, modifier)
     }
 }
 

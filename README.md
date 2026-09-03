@@ -32,20 +32,21 @@ Every module arrives in the same three blocks, always in this order:
 Then a short check with an explanation of why the right answer is right, and one concrete
 thing to actually do this week.
 
-Six core modules: budgeting, compound interest, good vs bad debt, saving vs investing,
-investing basics, and how a payslip works.
+Ten modules, in reading order: budgeting, compound interest, good debt and bad debt,
+saving vs investing, shares and funds, gross vs net pay, buy now pay later, your credit
+record, tax nobody deducts for you, and rent vs buy.
 
 ## Status
 
-The app is complete and building. Six modules, six simulators, four screens.
+The app is complete and building. Ten modules, ten simulators, four screens.
 
 - [x] Gradle build, Android manifest, resources
 - [x] Design system — semantic colour, type scale, light and dark
 - [x] Local persistence (DataStore) for progress and settings
-- [x] Financial engine — six calculators, 48 unit tests
-- [x] All six modules of content, with a content integrity test
+- [x] Financial engine — ten calculators, 81 unit tests
+- [x] All ten modules of content, with a content integrity test
 - [x] Home, module, settings and about screens
-- [x] Six interactive simulators with hand-drawn charts
+- [x] Ten interactive simulators with hand-drawn charts
 - [x] Bundled Archivo and IBM Plex Mono, static weights, no runtime download
 - [ ] Accessibility pass on a real device at 200% text size
 - [ ] App icon — currently a marked placeholder

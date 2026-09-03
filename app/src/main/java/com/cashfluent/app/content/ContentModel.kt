@@ -13,8 +13,11 @@ package com.cashfluent.app.content
 
 enum class Track { CORE, BONUS }
 
-/** Which "Try it with your numbers" panel the module opens. */
-enum class SimulatorKind { BUDGET, COMPOUND, DEBT, INFLATION, FEES, PAYSLIP }
+/** Which "Try it with your numbers" panel the module opens. One per module, no reuse. */
+enum class SimulatorKind {
+    BUDGET, COMPOUND, DEBT, INFLATION, FEES, PAYSLIP,
+    INSTALMENTS, CREDIT, SIDE_INCOME, MORTGAGE,
+}
 
 /** Whether a headline number is something gained or something it costs you. */
 enum class Tone { GOOD, COST }

@@ -248,6 +248,12 @@ fun ComparisonBars(
     rightDisplay: String,
     contentDescription: String,
     modifier: Modifier = Modifier,
+    /**
+     * Which bar is the better outcome, and so gets the green. Usually the left one, but
+     * some comparisons change sides as the sliders move and the colour has to follow the
+     * answer rather than the position.
+     */
+    highlightLeft: Boolean = true,
 ) {
     val colors = CashfluentTheme.colors
     val peak = maxOf(leftValue, rightValue).coerceAtLeast(0.0001f)
@@ -259,8 +265,8 @@ fun ComparisonBars(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         listOf(
-            Triple(leftLabel, leftValue, leftDisplay) to colors.grow,
-            Triple(rightLabel, rightValue, rightDisplay) to colors.cost,
+            Triple(leftLabel, leftValue, leftDisplay) to if (highlightLeft) colors.grow else colors.cost,
+            Triple(rightLabel, rightValue, rightDisplay) to if (highlightLeft) colors.cost else colors.grow,
         ).forEach { (bar, color) ->
             val (label, value, display) = bar
             Column {
