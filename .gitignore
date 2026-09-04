@@ -1,14 +1,18 @@
 *.iml
 .gradle/
-/local.properties
+.kotlin/
 /.idea/
 .DS_Store
-/build
-/app/build
+
+# Build output, wherever it is — not just at the root. tools/ has its own Gradle
+# build, and an anchored /build rule silently misses it.
+build/
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+node_modules/
+tools/design/out/
 *.apk
 *.aab
 *.keystore

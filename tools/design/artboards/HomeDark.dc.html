@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; }
+    a { color: #5CC3A0; text-decoration: none; }
+    a:hover { color: #7FD6B8; }
+  </style>
+</helmet>
+
+<div style="width:360px;height:800px;background:#0C1210;color:#E7EDE9;display:flex;flex-direction:column;overflow:hidden;">
+
+  <!-- room left for the real Android status bar -->
+  <div style="height:26px;flex:none;"></div>
+
+  <!-- top bar -->
+  <div style="display:flex;align-items:center;height:52px;padding:0 6px 0 16px;flex:none;">
+    <div style="font-size:19px;font-weight:700;letter-spacing:-0.025em;">Cash<span style="color:#5CC3A0;">fluent</span></div>
+    <div style="margin-left:auto;display:flex;">
+      <div style="height:48px;display:flex;align-items:center;padding:0 10px;font-size:12.5px;color:#8B9B94;">Why</div>
+      <div style="height:48px;display:flex;align-items:center;padding:0 10px;font-size:12.5px;color:#8B9B94;">Settings</div>
+    </div>
+  </div>
+
+  <!-- scrolling content -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:0 16px;overflow:hidden;">
+
+    <div style="font-size:14px;color:#8B9B94;margin-bottom:14px;">The money class you never had.</div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#8B9B94;">2 of 6 done</div>
+      <div style="flex:1;height:6px;border-radius:3px;background:#1C2622;overflow:hidden;">
+        <div style="width:33%;height:100%;border-radius:3px;background:#5CC3A0;"></div>
+      </div>
+    </div>
+
+    <!-- method card -->
+    <div style="background:#123028;border-radius:14px;padding:14px 16px;margin-bottom:18px;">
+      <div style="font-size:13px;font-weight:600;color:#7FD6B8;margin-bottom:9px;">Every module has three parts</div>
+      <div style="display:flex;gap:6px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;color:#7FD6B8;background:#141C19;border-radius:6px;padding:4px 7px;">① the idea</div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;color:#7FD6B8;background:#141C19;border-radius:6px;padding:4px 7px;">② the formula</div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;color:#7FD6B8;background:#141C19;border-radius:6px;padding:4px 7px;">③ real numbers</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+        <div style="height:44px;display:flex;align-items:center;padding:0 6px;font-size:12.5px;color:#7FD6B8;">Got it</div>
+      </div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B9B94;margin-bottom:10px;">Core · personal finance</div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+
+      <div style="display:flex;gap:11px;align-items:flex-start;background:#141C19;border:1px solid #26332E;border-radius:14px;padding:14px 15px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;font-weight:600;color:#7FD6B8;background:#123028;border-radius:8px;padding:5px 7px;flex:none;">01</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em;">Where your money actually goes</div>
+          <div style="font-size:12px;color:#8B9B94;margin-top:2px;">It leaves in small pieces you never decided on</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;color:#7FD6B8;background:#123028;border-radius:999px;padding:3px 8px;flex:none;">done</div>
+      </div>
+
+      <div style="display:flex;gap:11px;align-items:flex-start;background:#141C19;border:1px solid #26332E;border-radius:14px;padding:14px 15px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;font-weight:600;color:#7FD6B8;background:#123028;border-radius:8px;padding:5px 7px;flex:none;">02</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em;">Why time beats the amount</div>
+          <div style="font-size:12px;color:#8B9B94;margin-top:2px;">Your years are worth more than your salary</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;color:#7FD6B8;background:#123028;border-radius:999px;padding:3px 8px;flex:none;">done</div>
+      </div>
+
+      <div style="display:flex;gap:11px;align-items:flex-start;background:#141C19;border:1.5px solid #D9AE55;border-radius:14px;padding:13.5px 14.5px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;font-weight:600;color:#E6C378;background:#312712;border-radius:8px;padding:5px 7px;flex:none;">03</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em;">What borrowing actually costs</div>
+          <div style="font-size:12px;color:#8B9B94;margin-top:2px;">Debt isn't evil. Debt has a price</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;color:#E6C378;background:#312712;border-radius:999px;padding:3px 8px;flex:none;">start here</div>
+      </div>
+
+      <div style="display:flex;gap:11px;align-items:flex-start;background:#141C19;border:1px solid #26332E;border-radius:14px;padding:14px 15px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;font-weight:600;color:#8B9B94;background:#1C2622;border-radius:8px;padding:5px 7px;flex:none;">04</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em;">Why cash quietly shrinks</div>
+          <div style="font-size:12px;color:#8B9B94;margin-top:2px;">Same balance, less money</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;color:#8B9B94;background:#1C2622;border-radius:999px;padding:3px 8px;flex:none;">new</div>
+      </div>
+
+      <div style="display:flex;gap:11px;align-items:flex-start;background:#141C19;border:1px solid #26332E;border-radius:14px;padding:14px 15px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;font-weight:600;color:#8B9B94;background:#1C2622;border-radius:8px;padding:5px 7px;flex:none;">05</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em;">What you're actually buying</div>
+          <div style="font-size:12px;color:#8B9B94;margin-top:2px;">A share is a slice of a real company</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;color:#8B9B94;background:#1C2622;border-radius:999px;padding:3px 8px;flex:none;">new</div>
+      </div>
+
+      <div style="display:flex;gap:11px;align-items:flex-start;background:#141C19;border:1px solid #26332E;border-radius:14px;padding:14px 15px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;font-weight:600;color:#8B9B94;background:#1C2622;border-radius:8px;padding:5px 7px;flex:none;">06</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em;">Gross vs net</div>
+          <div style="font-size:12px;color:#8B9B94;margin-top:2px;">The ad's number isn't the one that arrives</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase;color:#8B9B94;background:#1C2622;border-radius:999px;padding:3px 8px;flex:none;">new</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:auto;padding:16px 0 18px;text-align:center;font-size:10.5px;color:#8B9B94;">Educational content. Not financial advice.</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

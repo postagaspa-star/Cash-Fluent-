@@ -51,6 +51,9 @@ The app is complete and building. Ten modules, ten simulators, four screens.
 - [ ] Accessibility pass on a real device at 200% text size
 - [ ] App icon — currently a marked placeholder
 
+Everything still to do, and every decision taken so far, is in
+**[BACKLOG.md](BACKLOG.md)**.
+
 ## Install it
 
 Every push builds a debug APK on CI. Open the **most recent green run** under
@@ -71,17 +74,26 @@ Requires Android Studio (Ladybug or newer) and JDK 17.
 
 ```bash
 ./gradlew assembleDebug     # build
-./gradlew testDebugUnitTest # run the financial engine tests
+./gradlew testDebugUnitTest # run the financial engine and content tests
+```
+
+Without the Android SDK you can still run the pure-Kotlin half — the ten calculators and
+the whole curriculum, 94 tests — on a plain JVM:
+
+```bash
+cd tools/verify && gradle test
 ```
 
 ## What's inside
 
 ```
 app/src/main/java/com/cashfluent/app/
+├── content/         the ten lessons, as typed Kotlin rather than JSON
 ├── data/            DataStore repositories — progress and settings
 ├── di/              a twelve-line service locator, no DI framework
 ├── domain/finance/  the calculators: pure Kotlin, no Android imports
-└── ui/              theme, navigation, screens
+└── ui/              theme, navigation, screens, simulators
+tools/               development only, ships nothing — see tools/README.md
 ```
 
 The calculators carry no Android dependency on purpose, so the numbers on screen are
