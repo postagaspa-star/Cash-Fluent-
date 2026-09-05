@@ -53,9 +53,14 @@ class FirestoreLeagueBackend(
     }
 
     /**
-     * One transaction: read the queue, sit in the league it names — or open the next one
-     * when that is full — and write your row. Two phones arriving for the last seat at
-     * once are serialised by Firestore, so one of them opens the new league.
+     * One transaction: read the queue, and sit in the league it names — or open the next
+     * one when that is full. Two phones arriving for the last seat at once are serialised
+     * by Firestore, so one of them opens the new league.
+     *
+     * The row itself is written afterwards, by [publish], and not inside this
+     * transaction. A rule may only read documents already committed, so a row written in
+     * the same commit as the league it belongs to would be judged against a league that
+     * does not exist yet — and the first person on a rung each week could never sit down.
      */
     override suspend fun takeSeat(week: Int, tier: Tier, me: Entrant): String {
         val lobby = db.collection(LOBBIES).document(League.lobbyId(week, tier))
@@ -77,7 +82,6 @@ class FirestoreLeagueBackend(
                 tx.update(lobby, SEATS, seats + 1)
                 tx.update(db.collection(LEAGUES).document(leagueId), SEATS, seats + 1)
             }
-            tx.set(row(leagueId, me.id), me.toRow() + (JOINED to FieldValue.serverTimestamp()))
             leagueId
         }.await()
     }
@@ -125,7 +129,6 @@ class FirestoreLeagueBackend(
         const val SEATS = "seats"
         const val OPENED = "opened"
         const val CREATED = "createdAt"
-        const val JOINED = "joinedAt"
         const val UPDATED = "updatedAt"
         const val NAME = "name"
         const val TOTAL = "totalPoints"

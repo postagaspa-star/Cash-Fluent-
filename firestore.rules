@@ -46,7 +46,7 @@ service cloud.firestore {
     }
 
     function rowIsWellFormed(row) {
-      return row.keys().hasOnly(['name', 'totalPoints', 'weekPoints', 'updatedAt', 'joinedAt'])
+      return row.keys().hasOnly(['name', 'totalPoints', 'weekPoints', 'updatedAt'])
         && row.keys().hasAll(['name', 'totalPoints', 'weekPoints'])
         && nameIsSane(row)
         && scoresAreSane(row);

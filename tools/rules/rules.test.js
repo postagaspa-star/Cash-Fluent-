@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const rules = fs.readFileSync(path.join(here, '..', '..', 'firestore.rules'), 'utf8');
@@ -60,6 +60,35 @@ test('a queue cannot be opened in a week that has been and gone, or one that has
       week: other, tier: 0, league: board(other), seats: 1, opened: 1,
     }));
   }
+});
+
+test('the first person on a rung opens a league, then writes a row on it', async () => {
+  // Exactly what FirestoreLeagueBackend does: the seat in one commit, the row in the next.
+  const me = env.authenticatedContext('phone-a').firestore();
+  const leagueId = board(THIS_WEEK);
+  const seat = writeBatch(me);
+  seat.set(doc(me, 'lobbies', `w${THIS_WEEK}-wood`), {
+    week: THIS_WEEK, tier: 0, league: leagueId, seats: 1, opened: 1,
+  });
+  seat.set(doc(me, 'leagues', leagueId), { week: THIS_WEEK, tier: 0, seats: 1 });
+  await assertSucceeds(seat.commit());
+  await assertSucceeds(setDoc(doc(me, 'leagues', leagueId, 'members', 'phone-a'), row()));
+});
+
+test('a row written in the same commit as its own league is refused', async () => {
+  // The reason the two above are two steps: a rule reads committed data only, so a league
+  // created alongside the row does not exist yet as far as this row is concerned.
+  const me = env.authenticatedContext('phone-a').firestore();
+  const leagueId = board(THIS_WEEK);
+  const both = writeBatch(me);
+  both.set(doc(me, 'leagues', leagueId), { week: THIS_WEEK, tier: 0, seats: 1 });
+  both.set(doc(me, 'leagues', leagueId, 'members', 'phone-a'), row());
+  await assertFails(both.commit());
+});
+
+test('a row cannot be dropped into a league nobody opened', async () => {
+  const me = env.authenticatedContext('phone-a').firestore();
+  await assertFails(setDoc(doc(me, 'leagues', 'w9999-wood-1', 'members', 'phone-a'), row()));
 });
 
 test('nobody who has not signed in can read a board or write a row', async () => {
