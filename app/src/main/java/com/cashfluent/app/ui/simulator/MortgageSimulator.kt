@@ -163,15 +163,21 @@ fun MortgageSimulator(currency: Currency, modifier: Modifier = Modifier) {
             highlightLeft = !owningWins,
         )
 
+        // With a high enough rent against a cheap enough place, owning takes less cash
+        // out than renting does, and the sentence has to say "less" — not "-X more".
+        val extraCash = comparison.extraCashOut
+        val draw = abs(comparison.net) < cost.monthlyTotal
+
         PlainEnglishResult(
             text = buildString {
                 append("Over $years ${if (years == 1) "year" else "years"} owning costs ")
-                append("${Money.amount(comparison.extraCashOut, currency)} more in cash, and ")
+                append(Money.amount(abs(extraCash), currency))
+                append(if (extraCash >= 0.0) " more in cash, and " else " less in cash, and ")
                 append("leaves you owning ${Money.amount(comparison.equity, currency)} of the ")
                 append("place. ")
                 append(
                     when {
-                        abs(comparison.net) < cost.monthlyTotal ->
+                        draw ->
                             "That's a draw, to within a month's payment — at this point it " +
                                 "isn't a money question at all."
                         owningWins ->
@@ -184,7 +190,8 @@ fun MortgageSimulator(currency: Currency, modifier: Modifier = Modifier) {
                     },
                 )
             },
-            tone = if (owningWins) Tone.GOOD else null,
+            // A draw is not a win, so it does not get the green.
+            tone = if (owningWins && !draw) Tone.GOOD else null,
         )
     }
 }

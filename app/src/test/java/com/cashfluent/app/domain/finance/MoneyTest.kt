@@ -17,6 +17,13 @@ class MoneyTest {
     }
 
     @Test
+    fun `a negative amount puts the sign before the symbol, and never shows minus zero`() {
+        assertEquals("-\$87,278", Money.amount(-87_278.0, Currency.USD))
+        assertEquals("-€0.50", Money.preciseAmount(-0.5, Currency.EUR))
+        assertEquals("£0", Money.amount(-0.4, Currency.GBP))
+    }
+
+    @Test
     fun `rates read as percentages`() {
         assertEquals("18.4%", Money.percent(0.184166))
         assertEquals("25.0%", Money.percent(0.25))

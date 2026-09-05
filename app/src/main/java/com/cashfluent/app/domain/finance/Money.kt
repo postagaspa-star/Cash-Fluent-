@@ -1,6 +1,7 @@
 package com.cashfluent.app.domain.finance
 
 import java.util.Locale
+import kotlin.math.abs
 
 /**
  * The currency the user picked in Settings. It changes the symbol only — the example
@@ -20,9 +21,17 @@ enum class Currency(val code: String, val symbol: String) {
 
 object Money {
 
-    /** "131,757" — grouped, no decimals. What result tiles and worked examples use. */
-    fun amount(value: Double, currency: Currency, decimals: Int = 0): String =
-        currency.symbol + String.format(Locale.US, "%,.${decimals}f", value)
+    /**
+     * "131,757" — grouped, no decimals. What result tiles and worked examples use.
+     *
+     * A negative amount reads "-$120", sign first, never "$-120". Anything that rounds
+     * to zero drops the sign, so "-0" cannot appear either.
+     */
+    fun amount(value: Double, currency: Currency, decimals: Int = 0): String {
+        val digits = String.format(Locale.US, "%,.${decimals}f", abs(value))
+        val negative = value < 0.0 && digits.any { it in '1'..'9' }
+        return (if (negative) "-" else "") + currency.symbol + digits
+    }
 
     /** "1,631.67" — for anything monthly, where the cents carry meaning. */
     fun preciseAmount(value: Double, currency: Currency): String = amount(value, currency, decimals = 2)
