@@ -18,9 +18,9 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
 
         composable(Destinations.HOME) {
             HomeScreen(
-                onOpenModule = { id -> navController.navigate(Destinations.module(id)) },
-                onOpenSettings = { navController.navigate(Destinations.SETTINGS) },
-                onOpenAbout = { navController.navigate(Destinations.ABOUT) },
+                onOpenModule = { id -> navController.open(Destinations.module(id)) },
+                onOpenSettings = { navController.open(Destinations.SETTINGS) },
+                onOpenAbout = { navController.open(Destinations.ABOUT) },
             )
         }
 
@@ -36,6 +36,7 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
                     // Replace rather than stack, so "up next" cannot build a long back stack.
                     navController.navigate(Destinations.module(id)) {
                         popUpTo(Destinations.HOME)
+                        launchSingleTop = true
                     }
                 },
             )
@@ -44,7 +45,7 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
         composable(Destinations.SETTINGS) {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
-                onOpenAbout = { navController.navigate(Destinations.ABOUT) },
+                onOpenAbout = { navController.open(Destinations.ABOUT) },
             )
         }
 
@@ -53,3 +54,9 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
         }
     }
 }
+
+/**
+ * Two taps in quick succession — easy on a card that fills the width of the screen —
+ * used to push the same destination twice, so the first press of Back went nowhere.
+ */
+private fun NavHostController.open(route: String) = navigate(route) { launchSingleTop = true }
