@@ -1,14 +1,14 @@
 package com.cashfluent.app.domain.league
 
-import com.cashfluent.app.domain.game.Medal
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.zip.CRC32
 
 /**
  * Everything a league needs to know about one person, and nothing else: a random id
- * that stands in for an account, the nickname they typed, their points, and a medal
- * per lesson. It travels as one line of text — a message, not a request to a server.
+ * that stands in for an account, the nickname they typed, their points, and the rung
+ * of the ladder they are on. It travels as one line of text — a message, not a request
+ * to a server.
  */
 data class LeagueCard(
     val id: String,
@@ -16,12 +16,10 @@ data class LeagueCard(
     val totalPoints: Int,
     val week: Int,
     val weekPoints: Int,
-    val medals: List<Medal>,
+    val tier: Tier,
 ) {
     /** A card from an earlier week has nothing on the board this week. */
     fun pointsThisWeek(currentWeek: Int): Int = if (week == currentWeek) weekPoints else 0
-
-    val medalCount: Int get() = medals.count { it != Medal.NONE }
 }
 
 /**
@@ -38,7 +36,7 @@ object Week {
 }
 
 /**
- * The card as text: `CF1|id|name|total|week|weekPoints|medals|crc`.
+ * The card as text: `CF1|id|name|total|week|weekPoints|tier|crc`.
  *
  * The checksum catches a card mangled in transit; it is not a signature, and a league
  * of friends is an honour system, like a scoreboard on paper. Everything read from a
@@ -50,20 +48,17 @@ object LeagueCards {
     const val MAX_NAME = 20
     const val MAX_POINTS = 9_999_999
     const val MAX_WEEK = 999_999
-    const val MEDAL_SLOTS = 10
 
     private const val SEPARATOR = "|"
     private val ID = Regex("[0-9a-f]{8}")
     private val TOKEN = Regex(
-        """CF1\|[0-9a-f]{8}\|[A-Za-z0-9%+*._-]{0,120}\|\d{1,7}\|\d{1,6}\|\d{1,7}\|[0-3]{10}\|[0-9a-f]{8}""",
+        """CF1\|[0-9a-f]{8}\|[A-Za-z0-9%+*._-]{0,120}\|\d{1,7}\|\d{1,6}\|\d{1,7}\|[0-7]\|[0-9a-f]{8}""",
     )
 
     /** What a nickname is allowed to be: printable, no separator, at most [MAX_NAME] characters. */
     fun cleanName(raw: String): String = raw.filter { it >= ' ' && it != '|' }.trim().take(MAX_NAME)
 
     fun encode(card: LeagueCard): String {
-        val medals = card.medals.take(MEDAL_SLOTS).joinToString("") { it.digit.toString() }
-            .padEnd(MEDAL_SLOTS, Medal.NONE.digit)
         val payload = listOf(
             PREFIX,
             card.id,
@@ -71,7 +66,7 @@ object LeagueCards {
             card.totalPoints.coerceIn(0, MAX_POINTS),
             card.week.coerceIn(0, MAX_WEEK),
             card.weekPoints.coerceIn(0, MAX_POINTS),
-            medals,
+            card.tier.digit,
         ).joinToString(SEPARATOR)
         return payload + SEPARATOR + checksum(payload)
     }
@@ -89,10 +84,9 @@ object LeagueCards {
         val total = fields[3].toIntOrNull()?.takeIf { it in 0..MAX_POINTS } ?: return null
         val week = fields[4].toIntOrNull()?.takeIf { it in 0..MAX_WEEK } ?: return null
         val weekPoints = fields[5].toIntOrNull()?.takeIf { it in 0..total } ?: return null
-        val medals = fields[6].takeIf { it.length == MEDAL_SLOTS && it.all { c -> c in '0'..'3' } }
-            ?.map(Medal::fromDigit) ?: return null
+        val tier = fields[6].takeIf { it.length == 1 && it[0] in '0'..'7' }?.let { Tier.fromDigit(it[0]) } ?: return null
 
-        return LeagueCard(id, name, total, week, weekPoints, medals)
+        return LeagueCard(id, name, total, week, weekPoints, tier)
     }
 
     /** Every intact card in a pasted message, one per person, in the order they appear. */

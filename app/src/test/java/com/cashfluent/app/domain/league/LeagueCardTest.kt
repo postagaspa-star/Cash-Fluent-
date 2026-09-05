@@ -1,6 +1,5 @@
 package com.cashfluent.app.domain.league
 
-import com.cashfluent.app.domain.game.Medal
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -9,18 +8,14 @@ import org.junit.Test
 
 class LeagueCardTest {
 
-    private val medals = listOf(
-        Medal.GOLD, Medal.SILVER, Medal.NONE, Medal.BRONZE, Medal.NONE,
-        Medal.NONE, Medal.NONE, Medal.NONE, Medal.NONE, Medal.NONE,
-    )
-    private val marco = LeagueCard("0badf00d", "Marco", 1_240, 2957, 320, medals)
-    private val giulia = LeagueCard("cafe1234", "Giulia B.", 900, 2957, 410, medals)
+    private val marco = LeagueCard("0badf00d", "Marco", 1_240, 2957, 320, Tier.GOLD)
+    private val giulia = LeagueCard("cafe1234", "Giulia B.", 900, 2957, 410, Tier.GOLD)
 
     @Test
     fun `a card survives the trip through text`() {
         val token = LeagueCards.encode(marco)
-        // Medals in lesson order, one digit each: gold 3, silver 2, none 0, bronze 1.
-        assertTrue(token, token.startsWith("CF1|0badf00d|Marco|1240|2957|320|3201000000|"))
+        // Gold is the fourth rung, digit 3.
+        assertTrue(token, token.startsWith("CF1|0badf00d|Marco|1240|2957|320|3|"))
         assertEquals(marco, LeagueCards.decode(token))
     }
 
@@ -41,12 +36,13 @@ class LeagueCardTest {
         val token = LeagueCards.encode(marco)
         assertNull(LeagueCards.decode(token.replace("|1240|", "|9240|")))
         assertNull(LeagueCards.decode(token.replace("Marco", "Marc0")))
+        assertNull(LeagueCards.decode(token.replace("|3|", "|7|")))
         assertNull(LeagueCards.decode(token.dropLast(1)))
     }
 
     @Test
     fun `nonsense is refused, never thrown`() {
-        listOf("", "CF1", "CF1|hello", "CF1|0badf00d|x|1|1|1|0000000000|00000000", "hello world", "CF1|||||||")
+        listOf("", "CF1", "CF1|hello", "CF1|0badf00d|x|1|1|1|0|00000000", "hello world", "CF1|||||||", "CF1|0badf00d|x|1|1|1|9|00000000")
             .forEach { assertNull(it, LeagueCards.decode(it)) }
     }
 
@@ -90,12 +86,14 @@ class LeagueCardTest {
 
     @Test
     fun `the board ranks this week first, then everything ever, and a stale card scores nothing`() {
-        val stale = LeagueCard("deadbeef", "Luca", 5_000, 2950, 900, medals)
-        val board = League.standings(marco, listOf(giulia, stale), currentWeek = 2957)
+        val stale = LeagueCard("deadbeef", "Luca", 5_000, 2950, 900, Tier.GOLD)
+        val board = League.standings(marco, listOf(giulia, stale), currentWeek = 2957, tier = Tier.GOLD)
         assertEquals(listOf("Giulia B.", "Marco", "Luca"), board.map { it.card.name })
         assertEquals(listOf(1, 2, 3), board.map { it.position })
         assertEquals(listOf(410, 320, 0), board.map { it.weekPoints })
         assertEquals(listOf(false, true, false), board.map { it.isYou })
+        // Two in the promotion zone, and Luca, with nothing this week, in the drop.
+        assertEquals(listOf(Zone.PROMOTION, Zone.PROMOTION, Zone.DEMOTION), board.map { it.zone })
     }
 
     @Test
@@ -115,11 +113,11 @@ class LeagueCardTest {
 
     @Test
     fun `a league holds twenty people and not one more`() {
-        val crowd = (1..25).map { LeagueCard("%08x".format(it), "P$it", it, 2957, it, medals) }
+        val crowd = (1..25).map { LeagueCard("%08x".format(it), "P$it", it, 2957, it, Tier.WOOD) }
         val result = League.merge(emptyList(), crowd, yourId = marco.id)
         assertEquals(League.MAX_FRIENDS, result.friends.size)
         assertEquals(19, result.added)
         assertEquals(6, result.refusedFull)
-        assertFalse(League.standings(marco, result.friends, 2957).size > League.SIZE)
+        assertFalse(League.standings(marco, result.friends, 2957, Tier.WOOD).size > League.SIZE)
     }
 }

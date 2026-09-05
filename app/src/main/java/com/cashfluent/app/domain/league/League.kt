@@ -6,6 +6,7 @@ data class Standing(
     val position: Int,
     val isYou: Boolean,
     val weekPoints: Int,
+    val zone: Zone,
 )
 
 data class MergeResult(
@@ -22,14 +23,14 @@ data class MergeResult(
 /**
  * A league is the people whose cards you have on your phone, and you. Twenty at most,
  * ranked on this week's points, because a place in a list of twenty is legible and a
- * place in a list of a million is not.
+ * place in a list of a million is not. The zones follow the rules in [Promotion].
  */
 object League {
 
-    const val SIZE = 20
+    const val SIZE = Promotion.LEAGUE_SIZE
     const val MAX_FRIENDS = SIZE - 1
 
-    fun standings(you: LeagueCard, friends: List<LeagueCard>, currentWeek: Int): List<Standing> {
+    fun standings(you: LeagueCard, friends: List<LeagueCard>, currentWeek: Int, tier: Tier): List<Standing> {
         val everyone = friends.filter { it.id != you.id } + you
         val ordered = everyone.sortedWith(
             compareByDescending<LeagueCard> { it.pointsThisWeek(currentWeek) }
@@ -37,7 +38,9 @@ object League {
                 .thenBy { it.name.lowercase() },
         )
         return ordered.mapIndexed { index, card ->
-            Standing(card, index + 1, card.id == you.id, card.pointsThisWeek(currentWeek))
+            val position = index + 1
+            val points = card.pointsThisWeek(currentWeek)
+            Standing(card, position, card.id == you.id, points, Promotion.zone(position, ordered.size, tier, points))
         }
     }
 
