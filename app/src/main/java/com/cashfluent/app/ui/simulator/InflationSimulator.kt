@@ -36,7 +36,9 @@ fun InflationSimulator(currency: Currency, modifier: Modifier = Modifier) {
     val principal = amount.toDouble()
     val cashReal = Inflation.realValueAfter(principal, accountRate / 100.0, inflation / 100.0, n)
     val investedReal = Inflation.realValueAfter(principal, investRate / 100.0, inflation / 100.0, n)
-    val beatingInflation = accountRate >= inflation
+    // Strictly greater: an account that merely matches inflation is standing still, and
+    // "beating inflation — that's unusual" would be the wrong sentence for 0% against 0%.
+    val beatingInflation = accountRate > inflation
 
     SimulatorScaffold(
         onReset = {

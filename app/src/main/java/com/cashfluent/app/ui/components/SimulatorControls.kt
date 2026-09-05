@@ -21,12 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.cashfluent.app.content.Tone
 import com.cashfluent.app.ui.theme.CashfluentTheme
 import com.cashfluent.app.ui.theme.CashfluentType
+import kotlin.math.roundToInt
 
 /**
  * Every slider shows its current value, in monospace, above the track — and its limits
@@ -46,7 +48,9 @@ fun LabeledSlider(
     modifier: Modifier = Modifier,
 ) {
     val colors = CashfluentTheme.colors
-    val stepCount = (((valueRange.endInclusive - valueRange.start) / step).toInt() - 1)
+    // Rounded, not truncated: 2.5f / 0.05f is not exactly 50 in floating point, and a
+    // truncated count would put every stop of the slider slightly off its label.
+    val stepCount = (((valueRange.endInclusive - valueRange.start) / step).roundToInt() - 1)
         .coerceAtLeast(0)
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -173,7 +177,7 @@ fun ResetLink(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) 
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
-            .clickable(onClick = onClick),
+            .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.CenterStart,
     ) {
         Text(text = text, style = MaterialTheme.typography.bodyMedium, color = colors.grow)

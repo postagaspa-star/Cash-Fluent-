@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.cashfluent.app.content.Tone
 import com.cashfluent.app.domain.finance.Currency
@@ -111,11 +112,15 @@ fun PayslipSimulator(currency: Currency, modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .heightIn(min = 52.dp)
                 .background(colors.grow, RoundedCornerShape(12.dp))
-                .clickable { raiseTaken = !raiseTaken },
+                .clickable(role = Role.Button) { raiseTaken = !raiseTaken },
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = if (raiseTaken) "Take the raise away" else "Give yourself a 2,000 raise",
+                text = if (raiseTaken) {
+                    "Take the raise away"
+                } else {
+                    "Give yourself a ${Money.amount(RAISE, currency)} raise"
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.paper,
             )

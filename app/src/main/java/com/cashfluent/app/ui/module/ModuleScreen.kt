@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -117,10 +118,10 @@ fun ModuleScreen(
                     onAnswer = viewModel::answer,
                 )
             }
-            item {
-                if (state.allAnswered) {
-                    CompletionBlock(module = module, onOpenModule = onOpenModule, onBack = onBack)
-                }
+            // Added only once the check is complete. An empty item still gets the column's
+            // 44dp of spacing, which showed up as a blank band at the foot of every lesson.
+            if (state.allAnswered) {
+                item { CompletionBlock(module = module, onOpenModule = onOpenModule, onBack = onBack) }
             }
         }
     }
@@ -363,7 +364,7 @@ private fun CompletionBlock(
                     .fillMaxWidth()
                     .background(colors.surface, RoundedCornerShape(14.dp))
                     .border(1.dp, colors.line, RoundedCornerShape(14.dp))
-                    .clickable { onOpenModule(next.id) }
+                    .clickable(role = Role.Button) { onOpenModule(next.id) }
                     .padding(15.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -396,7 +397,7 @@ private fun CompletionBlock(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp)
-                .clickable(onClick = onBack),
+                .clickable(role = Role.Button, onClick = onBack),
             contentAlignment = Alignment.Center,
         ) {
             Text(
