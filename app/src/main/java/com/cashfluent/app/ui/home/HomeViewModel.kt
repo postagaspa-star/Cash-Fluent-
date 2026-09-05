@@ -42,15 +42,15 @@ class HomeViewModel : ViewModel() {
 
     private val progressRepository = ServiceLocator.progressRepository
     private val settingsRepository = ServiceLocator.settingsRepository
-    private val playerRepository = ServiceLocator.playerRepository
+    private val league = ServiceLocator.league
 
     init {
         // Home is the first screen anyone sees on a Monday, so this is where a week closes.
-        viewModelScope.launch { playerRepository.settle() }
+        viewModelScope.launch { league.settle() }
     }
 
     val state: StateFlow<HomeState> =
-        combine(progressRepository.progress, settingsRepository.settings, playerRepository.player, ::buildState)
+        combine(progressRepository.progress, settingsRepository.settings, league.player, ::buildState)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
