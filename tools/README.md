@@ -20,6 +20,21 @@ It points `srcDir` at the real files in `app/src/`, so it cannot drift from what
 It needs Maven Central and a Gradle on the path; it does not need the Android SDK.
 Anything importing `android.*` or Compose is out of its reach and is verified by CI.
 
+## `rules/` — test what the server will and will not accept
+
+`firestore.rules` is the only thing between a public app and twenty strangers' scores, so
+it is tested rather than trusted. Ten cases run against the Firestore emulator: who may
+read, who may write their own row, what a score is allowed to be, and — the one that
+would fail silently — that the rules count the week with the same arithmetic as
+`Week.index` on the phone.
+
+```
+cd tools/rules && npm install && npm test
+```
+
+It needs Node and a JDK on the path (the emulator is a Java process), and it never
+touches the real project: the emulator runs under the id `demo-cashfluent`.
+
 ## `design/` — render the screens without installing anything
 
 Waiting for CI, downloading an APK and reinstalling is a slow loop for a spacing

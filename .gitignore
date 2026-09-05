@@ -13,6 +13,11 @@ build/
 local.properties
 node_modules/
 tools/design/out/
+# Firebase CLI leftovers: emulator logs and its local cache.
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebase/
 *.apk
 *.aab
 *.keystore

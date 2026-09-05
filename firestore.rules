@@ -1,0 +1,104 @@
+rules_version = '2';
+
+// Cashfluent's league, and the whole of what a phone may do to it.
+//
+// Three collections:
+//   lobbies/{week}-{rung}                  which league on a rung is filling up
+//   leagues/{leagueId}                     one board of twenty: its week and its rung
+//   leagues/{leagueId}/members/{uid}       one row: a nickname and two numbers
+//
+// The shape of the thing: everyone signed in — anonymously, which is the only way in —
+// can read boards, because a league you cannot see is not a league. Writing is narrow:
+// your row, on a board whose week has not ended, with fields inside bounds the app's own
+// arithmetic can never exceed. Points are declared by the phone and the rules can only
+// bound them; that is said plainly in the README rather than dressed up as security.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // The same arithmetic as Week.index on the phone: whole days since the epoch, shifted
+    // so a week begins on Monday. The server's clock decides, so a phone that sets its own
+    // clock forward cannot post to next week's board.
+    function currentWeek() {
+      return (request.time.toMillis() / 86400000 + 3) / 7;
+    }
+
+    function isMine(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // 4 rounds x 100 points x 500 games is far more than a week holds. Anything past it is
+    // not a score, so it is not a row.
+    function scoresAreSane(row) {
+      return row.totalPoints is int
+        && row.weekPoints is int
+        && row.weekPoints >= 0
+        && row.weekPoints <= 200000
+        && row.totalPoints >= row.weekPoints
+        && row.totalPoints <= 9999999;
+    }
+
+    function nameIsSane(row) {
+      return row.name is string && row.name.size() <= 20;
+    }
+
+    function rowIsWellFormed(row) {
+      return row.keys().hasOnly(['name', 'totalPoints', 'weekPoints', 'updatedAt', 'joinedAt'])
+        && row.keys().hasAll(['name', 'totalPoints', 'weekPoints'])
+        && nameIsSane(row)
+        && scoresAreSane(row);
+    }
+
+    match /lobbies/{lobbyId} {
+      allow read: if signedIn();
+      // A queue is opened, and seats are taken, for the week that is running now. Nobody
+      // can reach back into a finished week or forward into one that has not begun.
+      allow create: if signedIn()
+        && request.resource.data.week == currentWeek()
+        && request.resource.data.seats == 1
+        && request.resource.data.opened == 1
+        && request.resource.data.league is string;
+      allow update: if signedIn()
+        && request.resource.data.week == currentWeek()
+        && resource.data.week == currentWeek()
+        && request.resource.data.seats is int
+        && request.resource.data.seats > 0
+        && request.resource.data.opened >= resource.data.opened;
+      allow delete: if false;
+    }
+
+    match /leagues/{leagueId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.week == currentWeek()
+        && request.resource.data.seats == 1;
+      allow update: if signedIn()
+        && resource.data.week == currentWeek()
+        && request.resource.data.week == resource.data.week
+        && request.resource.data.tier == resource.data.tier
+        && request.resource.data.seats is int;
+      allow delete: if false;
+
+      match /members/{uid} {
+        // Twenty pseudonyms and their scores. Nothing here identifies anyone.
+        allow read: if signedIn();
+
+        // Only about yourself, only while the week is running, and only within bounds.
+        allow create, update: if isMine(uid)
+          && rowIsWellFormed(request.resource.data)
+          && get(/databases/$(database)/documents/leagues/$(leagueId)).data.week == currentWeek();
+
+        // Leaving is allowed; taking someone else off a board is not.
+        allow delete: if isMine(uid);
+      }
+    }
+
+    // Anything not named above does not exist.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

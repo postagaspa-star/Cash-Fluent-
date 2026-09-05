@@ -1,0 +1,13 @@
+{
+  "name": "cashfluent-rules-test",
+  "private": true,
+  "type": "module",
+  "description": "Runs firestore.rules against the Firestore emulator. Development only; ships nothing.",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-cashfluent \"node tools/rules/rules.test.js\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^11.1.0"
+  }
+}
