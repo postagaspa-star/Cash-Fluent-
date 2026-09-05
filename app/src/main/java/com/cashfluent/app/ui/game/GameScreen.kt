@@ -2,11 +2,14 @@ package com.cashfluent.app.ui.game
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +40,7 @@ import com.cashfluent.app.domain.game.ChoiceRound
 import com.cashfluent.app.domain.game.NumberRound
 import com.cashfluent.app.domain.game.Quantity
 import com.cashfluent.app.domain.game.Scoring
+import com.cashfluent.app.domain.league.Zone
 import com.cashfluent.app.ui.components.Callout
 import com.cashfluent.app.ui.components.LabeledSlider
 import com.cashfluent.app.ui.components.Pill
@@ -71,6 +75,7 @@ fun GameScreen(
     LaunchedEffect(gameId) { viewModel.start(gameId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val currency by viewModel.currency.collectAsStateWithLifecycle()
+    val board by viewModel.board.collectAsStateWithLifecycle()
     val miniGame = state.miniGame
 
     Column(
@@ -92,6 +97,7 @@ fun GameScreen(
                 item {
                     ScoreBlock(
                         state = state,
+                        board = board,
                         onPlayAgain = viewModel::playAgain,
                         onAnother = { onOpenGame(viewModel.anotherGameId()) },
                         onOpenGames = onOpenGames,
@@ -321,6 +327,7 @@ private fun ChoiceInput(
 @Composable
 private fun ScoreBlock(
     state: GameState,
+    board: BoardPeek?,
     onPlayAgain: () -> Unit,
     onAnother: () -> Unit,
     onOpenGames: () -> Unit,
@@ -344,26 +351,28 @@ private fun ScoreBlock(
             )
         }
 
+        // Green when this is the best you have played it, neutral otherwise. Clay means
+        // what something costs you, and a first attempt at a mini-game costs you nothing.
         TotalStrip(
             label = UiStrings.SCORE,
             value = UiStrings.outOf(state.total, state.maxScore),
-            tone = if (state.total >= state.maxScore / 2) Tone.GOOD else Tone.COST,
+            tone = if (outcome?.newBest == true) Tone.GOOD else null,
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             ResultTile(
                 label = UiStrings.BEST,
                 value = UiStrings.outOf(best, state.maxScore),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
             ResultTile(
                 label = UiStrings.WEEK_SHORT,
                 value = UiStrings.points(outcome?.weekPoints ?: state.total),
                 valueColor = colors.grow,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
 
@@ -371,9 +380,81 @@ private fun ScoreBlock(
             Row { Pill(UiStrings.NEW_BEST, colors.growInk, colors.growSoft) }
         }
 
+        if (board != null) {
+            BoardPeekBlock(board = board, onOpenLeague = onOpenLeague)
+        }
+
         PrimaryButton(text = UiStrings.ANOTHER_GAME, onClick = onAnother)
         TextAction(text = UiStrings.PLAY_AGAIN, onClick = onPlayAgain)
-        TextAction(text = UiStrings.ALL_GAMES, onClick = onOpenGames)
-        TextAction(text = UiStrings.SEE_LEAGUE, onClick = onOpenLeague)
+        // The board above is the way into the league; without one, the link has to be.
+        TextAction(
+            text = if (board == null) UiStrings.SEE_LEAGUE else UiStrings.ALL_GAMES,
+            onClick = if (board == null) onOpenLeague else onOpenGames,
+        )
+    }
+}
+
+/**
+ * What the points just bought: your place, the three rows around you, and the number that
+ * would carry you into the promotion zone. This is the only moment in the app where
+ * earning and consequence sit in the same screenful.
+ */
+@Composable
+private fun BoardPeekBlock(board: BoardPeek, onOpenLeague: () -> Unit) {
+    val colors = CashfluentTheme.colors
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.surface, RoundedCornerShape(12.dp))
+            .border(1.dp, colors.line, RoundedCornerShape(12.dp))
+            .clickable(role = Role.Button, onClick = onOpenLeague)
+            .padding(horizontal = 14.dp, vertical = 14.dp),
+    ) {
+        SubLabel(UiStrings.WHERE_YOU_STAND)
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = UiStrings.standing(board.position, board.size),
+            style = CashfluentType.value,
+            color = colors.ink,
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = when {
+                board.zone == Zone.PROMOTION -> UiStrings.IN_PROMOTION
+                board.zone == Zone.DEMOTION -> UiStrings.IN_DEMOTION
+                board.gap != null -> UiStrings.gapToPromotion(board.gap)
+                else -> UiStrings.LEAGUE_ARROW
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = if (board.zone == Zone.DEMOTION) colors.costInk else colors.muted,
+        )
+        Spacer(Modifier.height(12.dp))
+        board.rows.forEach { standing ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Text(
+                    text = standing.position.toString(),
+                    style = CashfluentType.dataSmall,
+                    color = colors.muted,
+                    modifier = Modifier.width(24.dp),
+                )
+                Text(
+                    text = standing.entrant.name.ifBlank { UiStrings.UNNAMED },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (standing.isYou) colors.growInk else colors.ink,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = UiStrings.points(standing.weekPoints),
+                    style = CashfluentType.dataSmall,
+                    color = if (standing.isYou) colors.growInk else colors.muted,
+                )
+            }
+        }
     }
 }

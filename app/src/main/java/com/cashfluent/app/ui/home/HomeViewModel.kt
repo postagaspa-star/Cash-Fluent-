@@ -29,11 +29,11 @@ data class HomeState(
     val rows: List<HomeModuleRow>,
     val doneCount: Int,
     val total: Int,
-    val showMethodCard: Boolean,
     val points: Int,
     val weekPoints: Int,
     val tier: Tier,
     val gamesCount: Int,
+    val gamesPlayed: Int,
 ) {
     val fraction: Float get() = if (total == 0) 0f else doneCount.toFloat() / total
 }
@@ -57,10 +57,6 @@ class HomeViewModel : ViewModel() {
                 initialValue = buildState(Progress(), UserSettings(), Player()),
             )
 
-    fun dismissMethodCard() {
-        viewModelScope.launch { settingsRepository.dismissMethodCard() }
-    }
-
     private companion object {
         fun buildState(progress: Progress, settings: UserSettings, player: Player): HomeState {
             val startHere = progress.firstUnfinished(Modules.coreIds)
@@ -79,11 +75,11 @@ class HomeViewModel : ViewModel() {
                 rows = rows,
                 doneCount = progress.doneCountIn(Modules.coreIds),
                 total = Modules.coreIds.size,
-                showMethodCard = !settings.methodCardDismissed,
                 points = player.totalPoints,
                 weekPoints = player.weekPoints,
                 tier = player.tier,
                 gamesCount = MiniGames.all.size,
+                gamesPlayed = player.gamesWithBest,
             )
         }
 

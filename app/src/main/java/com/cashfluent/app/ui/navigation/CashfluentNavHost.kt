@@ -93,10 +93,7 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
         }
 
         composable(Destinations.LEAGUE) {
-            LeagueScreen(
-                onBack = { navController.popBackStack() },
-                onOpenGames = { navController.open(Destinations.games()) },
-            )
+            LeagueScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Destinations.SETTINGS) {

@@ -85,6 +85,42 @@ A failure stops at that step and is picked up the next time a screen opens. The 
 `firestore.rules` are covered by ten emulator tests, including the one that would fail
 silently: that the server counts weeks exactly as `Week.index` does on the phone.
 
+## 2b. The design panel, 5 September
+
+Three independent reviewers — an information architect, a visual designer, and a UX and
+accessibility specialist — were asked one question: why are the games and the league not
+visible on Home. They wrote separately, then read each other and voted. What they agreed
+on is built; what they split on is recorded here so it is not re-argued from scratch.
+
+**The diagnosis they shared.** The two entry points were set in `CashfluentType.dataSmall`
+in `colors.muted` — the smallest type in the app, in the weakest colour, in the family
+reserved for numbers — directly under "1 of 10 done" in the same style, and above the
+divider. Everything above a rule reads as toolbar. The eye filed all three lines as
+status, and status is not tapped.
+
+**Built.** Two cards side by side carrying the largest numerals on the screen, stacking
+above 130% text; the lesson keeps the only filled green button, so the two kinds of
+prominence do not compete. The method card moved to the top of the first lesson, where
+① ② ③ are actually visible. The league screen leads with the board and folds its two
+prose cards behind one line. The games catalogue leads with the button. The score screen
+shows where the points just left you, when there is a board to be left on. Three defects
+they found on the way: the score was rendered in clay — the palette's colour for *what it
+costs you* — directly above a green "New best" pill; one tile in the games row was built
+inline without the border the two beside it have; and the three-tile rows went ragged at
+200% text because a wrapped label grew its tile past its neighbours.
+
+**Deferred: a bottom navigation bar** (Lessons · Games · League). Two of the three voted
+to ship it and all three ranked it below the line. The costs they found: no root screen
+uses a `Scaffold`, so all three handle their own window insets and a bar hosted outside
+the nav host double-pads against the gesture inset; the live numbers that justify the bar
+(`3/10 · 12/60 · 3rd`) are spread across three view models and rank is in none of them;
+and a permanent League tab advertises the app's emptiest surface as one third of the
+product while the board can still be empty. Worth revisiting after the video, the Devpost
+page and the icon, not before.
+
+**Rejected: a week ring** — seven dots for days played. New persistence on `Player` for
+the 10% category, weeks from the deadline. Cut by all three on the second round.
+
 ## 3. Still to do before submission
 
 - [ ] **Enable anonymous sign-in** — see §1. One click, product owner's account.
@@ -97,6 +133,7 @@ silently: that the server counts weeks exactly as `Week.index` does on the phone
 - [x] **Make the repository public** — done 5 September. Keep it so: the install path in
       the README goes through Actions artifacts and GitHub releases, and neither is
       visible to a judge on a private repository.
+- [ ] **Bottom navigation bar**, if items above land early — see §2b for the costs found.
 - [ ] **Devpost page.**
 - [ ] **Demo video, 5 minutes or under.** Lesson → game → board, in that order.
 - [ ] **Refresh the Copy Deck artifact.** It still carries the six original lesson titles

@@ -18,6 +18,8 @@ data class ModuleUiState(
     val answers: Map<Int, Int> = emptyMap(),
     val currency: Currency = Currency.DEFAULT,
     val isDone: Boolean = false,
+    /** The three-part card, shown above the first lesson opened and then never again. */
+    val showMethodCard: Boolean = false,
 ) {
     val allAnswered: Boolean
         get() = module != null && answers.size >= module.check.size
@@ -41,6 +43,7 @@ class ModuleViewModel : ViewModel() {
             answers = module?.let { progress.of(it.id).answers }.orEmpty(),
             currency = settings.currency,
             isDone = module?.let { progress.isDone(it.id) } ?: false,
+            showMethodCard = !settings.methodCardDismissed,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ModuleUiState())
 
@@ -53,6 +56,11 @@ class ModuleViewModel : ViewModel() {
         moduleId.value = id
         if (Modules.byId(id) == null) return
         viewModelScope.launch { progressRepository.markStarted(id) }
+    }
+
+    /** The three blocks have been met; the card that names them can go. */
+    fun dismissMethodCard() {
+        viewModelScope.launch { settingsRepository.dismissMethodCard() }
     }
 
     /**

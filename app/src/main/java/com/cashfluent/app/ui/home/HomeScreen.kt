@@ -6,9 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,27 +28,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.data.model.ModuleStatus
-import com.cashfluent.app.domain.league.Tier
+import com.cashfluent.app.domain.finance.Money
 import com.cashfluent.app.ui.components.Pill
 import com.cashfluent.app.ui.components.ProgressBar
 import com.cashfluent.app.ui.components.SectionLabel
+import com.cashfluent.app.ui.components.TierBadge
 import com.cashfluent.app.ui.theme.CashfluentTheme
 import com.cashfluent.app.ui.theme.CashfluentType
 
 /**
- * One thing to tap, then everything else.
+ * Three things live in this app — lessons, games, a league — and this screen has to say
+ * so in its first second.
  *
- * The first version gave six identical cards equal weight and put the heaviest element
- * on screen — a saturated block explaining the method — above all of them. There was
- * nowhere for the eye to land. Now the lesson you are actually on gets a large card with
- * a real button, and the rest is a quiet list you scan rather than read.
+ * It used to say it in two twelve-point mono lines above the divider, in the same style
+ * as "1 of 10 done". That is the app's statistics voice, so the eye filed both of them
+ * as status and never touched them. They are now two cards carrying the largest numerals
+ * on the screen, while the lesson keeps the only filled green button: two kinds of
+ * prominence, so they do not compete.
  */
 @Composable
 fun HomeScreen(
@@ -71,25 +80,17 @@ fun HomeScreen(
             done = state.doneCount,
             total = state.total,
             fraction = state.fraction,
-            points = state.points,
-            weekPoints = state.weekPoints,
-            tier = state.tier,
-            gamesCount = state.gamesCount,
             onOpenAbout = onOpenAbout,
             onOpenSettings = onOpenSettings,
-            onOpenLeague = onOpenLeague,
-            onOpenGames = onOpenGames,
         )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 40.dp),
         ) {
-            if (state.showMethodCard) {
-                item {
-                    MethodStrip(onDismiss = viewModel::dismissMethodCard)
-                    Spacer(Modifier.height(28.dp))
-                }
+            item {
+                SectionCards(state = state, onOpenGames = onOpenGames, onOpenLeague = onOpenLeague)
+                Spacer(Modifier.height(32.dp))
             }
 
             if (hero != null) {
@@ -141,14 +142,8 @@ private fun Header(
     done: Int,
     total: Int,
     fraction: Float,
-    points: Int,
-    weekPoints: Int,
-    tier: Tier,
-    gamesCount: Int,
     onOpenAbout: () -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenLeague: () -> Unit,
-    onOpenGames: () -> Unit,
 ) {
     val colors = CashfluentTheme.colors
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -164,7 +159,7 @@ private fun Header(
             TopAction(text = UiStrings.SETTINGS, onClick = onOpenSettings)
         }
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -175,39 +170,103 @@ private fun Header(
             )
             ProgressBar(fraction, modifier = Modifier.weight(1f))
         }
-        // Two quiet lines: the games, and the league they feed.
-        Strip(
-            text = UiStrings.gamesStrip(gamesCount),
-            action = UiStrings.PLAY_ARROW,
-            onClick = onOpenGames,
-        )
-        Strip(
-            text = if (points == 0) UiStrings.LEAGUE_STRIP_EMPTY else UiStrings.leagueStrip(tier, weekPoints),
-            action = UiStrings.LEAGUE_ARROW,
-            onClick = onOpenLeague,
-        )
-        Spacer(Modifier.height(6.dp))
         HorizontalDivider(color = colors.line)
     }
 }
 
-/** One line, one destination: a label on the left, the way there on the right. */
+/**
+ * The games and the league, side by side, each carrying its own number in the app's
+ * largest numerals. Side by side until the text gets big: past 130% the two cards stack,
+ * because two columns of wrapped words is worse than one card after another.
+ */
 @Composable
-private fun Strip(text: String, action: String, onClick: () -> Unit) {
+private fun SectionCards(state: HomeState, onOpenGames: () -> Unit, onOpenLeague: () -> Unit) {
     val colors = CashfluentTheme.colors
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
+    val stacked = LocalDensity.current.fontScale > 1.3f
+
+    val games: @Composable (Modifier, Boolean) -> Unit = { modifier, fill ->
+        SectionCard(
+            fill = fill,
+            label = UiStrings.GAMES,
+            value = state.gamesCount.toString(),
+            valueColor = colors.ink,
+            caption = UiStrings.miniGamesSub(state.gamesPlayed),
+            action = UiStrings.PLAY_ARROW,
+            description = "${UiStrings.GAMES}, ${state.gamesCount} ${UiStrings.miniGamesSub(state.gamesPlayed)}",
+            onClick = onOpenGames,
+            modifier = modifier,
+        )
+    }
+    val league: @Composable (Modifier, Boolean) -> Unit = { modifier, fill ->
+        SectionCard(
+            fill = fill,
+            label = UiStrings.LEAGUE,
+            value = Money.number(state.weekPoints.toDouble()),
+            valueColor = if (state.weekPoints > 0) colors.grow else colors.muted,
+            caption = UiStrings.PTS_THIS_WEEK,
+            action = UiStrings.LEAGUE_ARROW,
+            badge = { TierBadge(state.tier) },
+            description = "${UiStrings.leagueName(state.tier)}, ${UiStrings.points(state.weekPoints)} this week",
+            onClick = onOpenLeague,
+            modifier = modifier,
+        )
+    }
+
+    if (stacked) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            games(Modifier.fillMaxWidth(), false)
+            league(Modifier.fillMaxWidth(), false)
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            games(Modifier.weight(1f).fillMaxHeight(), true)
+            league(Modifier.weight(1f).fillMaxHeight(), true)
+        }
+    }
+}
+
+/** One destination, read as one thing: a name, a number, what the number is, the way in. */
+@Composable
+private fun SectionCard(
+    label: String,
+    value: String,
+    valueColor: Color,
+    caption: String,
+    action: String,
+    description: String,
+    onClick: () -> Unit,
+    /** True when the card is one of a side-by-side pair, so the two ways in line up. */
+    fill: Boolean,
+    modifier: Modifier = Modifier,
+    badge: (@Composable () -> Unit)? = null,
+) {
+    val colors = CashfluentTheme.colors
+    Column(
+        modifier = modifier
+            .background(colors.surface, RoundedCornerShape(12.dp))
+            .border(1.dp, colors.line, RoundedCornerShape(12.dp))
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .semantics(mergeDescendants = true) { contentDescription = description }
+            .padding(horizontal = 14.dp, vertical = 12.dp),
     ) {
         Text(
-            text = text,
-            style = CashfluentType.dataSmall,
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
             color = colors.muted,
-            modifier = Modifier.weight(1f),
         )
+        if (badge != null) {
+            Spacer(Modifier.height(8.dp))
+            badge()
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(text = value, style = CashfluentType.value, color = valueColor)
+        Spacer(Modifier.height(2.dp))
+        Text(text = caption, style = MaterialTheme.typography.bodySmall, color = colors.muted)
+        if (fill) Spacer(Modifier.weight(1f)) else Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(10.dp))
         Text(text = action, style = MaterialTheme.typography.bodyMedium, color = colors.grow)
     }
 }
@@ -348,44 +407,6 @@ private fun LessonRow(row: HomeModuleRow, onClick: () -> Unit) {
             done -> Pill("done", colors.growInk, colors.growSoft)
             row.status == ModuleStatus.IN_PROGRESS -> Pill("open", colors.goldInk, colors.goldSoft)
             else -> Spacer(Modifier.width(0.dp))
-        }
-    }
-}
-
-/** One quiet line. It explains the app once and then goes away for good. */
-@Composable
-private fun MethodStrip(onDismiss: () -> Unit) {
-    val colors = CashfluentTheme.colors
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colors.surfaceAlt, RoundedCornerShape(12.dp))
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-    ) {
-        Text(
-            text = UiStrings.METHOD_TITLE,
-            style = MaterialTheme.typography.bodyMedium,
-            color = colors.ink,
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = UiStrings.METHOD_CHIPS.joinToString("   "),
-            style = CashfluentType.dataSmall,
-            color = colors.muted,
-        )
-        Box(
-            modifier = Modifier
-                .align(Alignment.End)
-                .heightIn(min = 44.dp)
-                .clickable(role = Role.Button, onClick = onDismiss)
-                .padding(horizontal = 4.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = UiStrings.METHOD_DISMISS,
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.grow,
-            )
         }
     }
 }

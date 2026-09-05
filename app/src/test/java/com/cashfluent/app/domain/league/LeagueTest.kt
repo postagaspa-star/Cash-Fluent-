@@ -77,6 +77,41 @@ class LeagueTest {
     }
 
     @Test
+    fun `the gap to the promotion zone is what it takes to pass fifth place`() {
+        val board = (1..12).map { entrant("p$it", "P$it", week = it * 100) }
+        val standings = League.standings(board, yourId = "p6", tier = Tier.BRONZE)
+        // p6 has 600 and sits 7th; fifth place is p8 with 800, so 201 points pass it.
+        assertEquals(7, standings.first { it.isYou }.position)
+        assertEquals(201, League.gapToPromotion(standings, "p6"))
+        // Already climbing, so there is no gap to report.
+        assertEquals(null, League.gapToPromotion(standings, "p12"))
+        assertEquals(null, League.gapToPromotion(standings, "p8"))
+        // Nobody by that name on this board.
+        assertEquals(null, League.gapToPromotion(standings, "ghost"))
+    }
+
+    @Test
+    fun `a small board has nobody to climb past`() {
+        val board = (1..3).map { entrant("p$it", "P$it", week = it * 100) }
+        val standings = League.standings(board, yourId = "p1", tier = Tier.BRONZE)
+        assertEquals(null, League.gapToPromotion(standings, "p1"))
+    }
+
+    @Test
+    fun `your neighbours are three rows that keep their height at either end`() {
+        val board = (1..12).map { entrant("p$it", "P$it", week = it * 100) }
+        val standings = League.standings(board, yourId = "p6", tier = Tier.BRONZE)
+        // Seventh of twelve: the person above, you, the person below.
+        assertEquals(listOf(6, 7, 8), League.around(standings, "p6").map { it.position })
+        // Top of the board: still three rows, sliding down instead of off the edge.
+        assertEquals(listOf(1, 2, 3), League.around(standings, "p12").map { it.position })
+        assertEquals(listOf(10, 11, 12), League.around(standings, "p1").map { it.position })
+        // A board smaller than the window is shown whole.
+        val two = League.standings(board.take(2), yourId = "p1", tier = Tier.BRONZE)
+        assertEquals(2, League.around(two, "p1").size)
+    }
+
+    @Test
     fun `every league on a rung has its own name, and every rung its own queue`() {
         assertEquals("w2957-gold", League.lobbyId(2957, Tier.GOLD))
         assertEquals("w2957-gold-3", League.boardId(2957, Tier.GOLD, 3))

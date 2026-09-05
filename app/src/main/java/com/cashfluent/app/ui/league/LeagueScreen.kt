@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -67,12 +69,12 @@ import com.cashfluent.app.ui.theme.CashfluentType
 @Composable
 fun LeagueScreen(
     onBack: () -> Unit,
-    onOpenGames: () -> Unit,
     viewModel: LeagueViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
     val state by viewModel.state.collectAsStateWithLifecycle()
     val (tierForeground, tierBackground) = tierColors(state.player.tier)
+    var showHow by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -131,29 +133,27 @@ fun LeagueScreen(
             }
 
             item {
-                NameField(stored = state.player.name, onChange = viewModel::setName)
-            }
-
-            item {
+                // IntrinsicSize.Min plus fillMaxHeight: at 200% text "ALL TIME" wraps, and
+                // without this its tile grows past the two beside it and the row goes ragged.
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     ResultTile(
                         label = UiStrings.WEEK_SHORT,
                         value = UiStrings.points(state.player.weekPoints),
                         valueColor = colors.grow,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                     )
                     ResultTile(
                         label = UiStrings.ALL_TIME,
                         value = UiStrings.points(state.player.totalPoints),
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                     )
                     ResultTile(
                         label = UiStrings.GAMES_PLAYED,
                         value = state.player.gamesPlayed.toString(),
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                     )
                 }
             }
@@ -182,7 +182,8 @@ fun LeagueScreen(
                 }
             }
 
-            item {
+            // With no seat there is no board, and a heading over nothing reads as a fault.
+            if (state.standings.isNotEmpty()) item {
                 SectionHeader(UiStrings.THIS_WEEK)
                 Spacer(Modifier.height(6.dp))
                 Text(
@@ -210,24 +211,6 @@ fun LeagueScreen(
                 }
             }
 
-            item {
-                Callout(
-                    label = UiStrings.LEAGUE_HOW_TITLE,
-                    body = UiStrings.LEAGUE_HOW,
-                    background = colors.surfaceAlt,
-                    foreground = colors.inkSecondary,
-                )
-            }
-
-            item {
-                Callout(
-                    label = UiStrings.LEAGUE_PRIVACY_TITLE,
-                    body = UiStrings.LEAGUE_PRIVACY,
-                    background = colors.surfaceAlt,
-                    foreground = colors.inkSecondary,
-                )
-            }
-
             item { SectionHeader(UiStrings.LADDER, color = colors.goldInk) }
 
             items(Tier.entries.reversed(), key = { "tier-${it.name}" }) { tier ->
@@ -236,7 +219,33 @@ fun LeagueScreen(
 
             item {
                 Spacer(Modifier.height(8.dp))
-                TextAction(text = UiStrings.ALL_GAMES, onClick = onOpenGames)
+                NameField(stored = state.player.name, onChange = viewModel::setName)
+            }
+
+            item {
+                TextAction(
+                    text = UiStrings.HOW_THIS_WORKS,
+                    onClick = { showHow = !showHow },
+                )
+            }
+
+            if (showHow) {
+                item {
+                    Callout(
+                        label = UiStrings.LEAGUE_HOW_TITLE,
+                        body = UiStrings.LEAGUE_HOW,
+                        background = colors.surfaceAlt,
+                        foreground = colors.inkSecondary,
+                    )
+                }
+                item {
+                    Callout(
+                        label = UiStrings.LEAGUE_PRIVACY_TITLE,
+                        body = UiStrings.LEAGUE_PRIVACY,
+                        background = colors.surfaceAlt,
+                        foreground = colors.inkSecondary,
+                    )
+                }
             }
         }
     }

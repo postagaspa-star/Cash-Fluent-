@@ -108,7 +108,7 @@ fun ModuleScreen(
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(44.dp),
         ) {
-            item { Hero(module) }
+            item { Hero(module, state.showMethodCard, viewModel::dismissMethodCard) }
             item { IdeaBlock(module) }
             item { MechanismBlock(module, state.currency) }
             item { RealNumbersBlock(module, state.currency) }
@@ -137,9 +137,15 @@ fun ModuleScreen(
 }
 
 @Composable
-private fun Hero(module: Module) {
+private fun Hero(module: Module, showMethod: Boolean, onDismissMethod: () -> Unit) {
     val colors = CashfluentTheme.colors
     Column(modifier = Modifier.padding(top = 4.dp)) {
+        // The three parts are named where they are about to be seen. On Home the same card
+        // explained the inside of a lesson to someone who had not opened one yet.
+        if (showMethod) {
+            MethodStrip(onDismiss = onDismissMethod)
+            Spacer(Modifier.height(24.dp))
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = module.displayNumber,
@@ -169,6 +175,44 @@ private fun Hero(module: Module) {
             style = MaterialTheme.typography.bodyLarge,
             color = colors.muted,
         )
+    }
+}
+
+/** One quiet card. It names the three blocks once, above the first of them, and goes. */
+@Composable
+private fun MethodStrip(onDismiss: () -> Unit) {
+    val colors = CashfluentTheme.colors
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.surfaceAlt, RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+    ) {
+        Text(
+            text = UiStrings.METHOD_TITLE,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.ink,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = UiStrings.METHOD_CHIPS.joinToString("   "),
+            style = CashfluentType.dataSmall,
+            color = colors.muted,
+        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.End)
+                .heightIn(min = 44.dp)
+                .clickable(role = Role.Button, onClick = onDismiss)
+                .padding(horizontal = 4.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = UiStrings.METHOD_DISMISS,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.grow,
+            )
+        }
     }
 }
 
