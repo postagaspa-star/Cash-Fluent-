@@ -50,6 +50,32 @@ object League {
         }
     }
 
+    /**
+     * The points that would carry you into the promotion zone: enough to pass whoever is
+     * last inside it. Null when you are already there, when there is no zone to climb
+     * into, or when the board is too small for the question to mean anything.
+     */
+    fun gapToPromotion(standings: List<Standing>, yourId: String): Int? {
+        val you = standings.firstOrNull { it.entrant.id == yourId } ?: return null
+        if (you.zone == Zone.PROMOTION) return null
+        val cutoff = standings.getOrNull(Promotion.PROMOTE_TOP - 1) ?: return null
+        if (cutoff.entrant.id == yourId) return null
+        return (cutoff.weekPoints - you.weekPoints + 1).coerceAtLeast(1)
+    }
+
+    /**
+     * You and your neighbours: the person above, you, the person below. At the top or the
+     * bottom of the board it slides to keep the same number of rows, so the block never
+     * changes height as you climb.
+     */
+    fun around(standings: List<Standing>, yourId: String, rows: Int = 3): List<Standing> {
+        if (standings.size <= rows) return standings
+        val index = standings.indexOfFirst { it.entrant.id == yourId }
+        if (index < 0) return standings.take(rows)
+        val start = (index - rows / 2).coerceIn(0, standings.size - rows)
+        return standings.subList(start, start + rows)
+    }
+
     /** `w2957-gold`: the queue every phone on a rung joins in a given week. */
     fun lobbyId(week: Int, tier: Tier): String = "w$week-${tier.name.lowercase()}"
 

@@ -35,9 +35,12 @@ object UiStrings {
     fun locked(moduleNumber: String) = "Finish module $moduleNumber to open this"
     const val PLAY_ARROW = "Play →"
     const val LEAGUE_ARROW = "League →"
-    fun gamesStrip(count: Int) = "$GAMES · $count mini-games"
-    const val LEAGUE_STRIP_EMPTY = "Play a game to earn your first points"
-    fun leagueStrip(tier: Tier, weekPoints: Int) = "${leagueName(tier)} · ${Money.number(weekPoints.toDouble())} pts this week"
+    const val PTS_THIS_WEEK = "pts this week"
+    fun miniGamesSub(played: Int) = when (played) {
+        0 -> "mini-games · none played yet"
+        1 -> "mini-games · 1 played"
+        else -> "mini-games · $played played"
+    }
 
     // Module
     const val SECTION_IDEA = "① The idea"
@@ -90,9 +93,8 @@ object UiStrings {
 
     // Games — the catalogue
     const val GAMES = "Games"
-    const val GAMES_INTRO = "Sixty mini-games on the same ten topics as the lessons. Each one takes a " +
-        "minute: four rounds, up to 100 points a round. Every answer is computed by the calculator " +
-        "behind the lesson, so a game can never disagree with it."
+    const val GAMES_INTRO = "Sixty games on the ten lesson topics. A minute each: four rounds, up to " +
+        "100 points a round, every answer computed by the calculator behind the lesson."
     const val SURPRISE_ME = "Surprise me"
     const val NOT_PLAYED = "not played yet"
     fun bestShort(best: Int, max: Int) = "best $best of $max"
@@ -116,6 +118,11 @@ object UiStrings {
     const val ANOTHER_GAME = "Another game"
     const val ALL_GAMES = "All games"
     const val SEE_LEAGUE = "See the league"
+    const val WHERE_YOU_STAND = "Where that puts you"
+    fun standing(position: Int, size: Int) = "${Promotion.ordinal(position)} of $size"
+    fun gapToPromotion(points: Int) = "${Money.number(points.toDouble())} pts from the promotion zone"
+    const val IN_PROMOTION = "In the promotion zone"
+    const val IN_DEMOTION = "In the drop zone — one good game moves you out"
     const val PICK_ONE = "Pick one to lock in"
     fun points(n: Int) = "${Money.number(n.toDouble())} pts"
     fun pointsSoFar(n: Int) = "$n pts so far"
@@ -141,6 +148,7 @@ object UiStrings {
     const val UNNAMED = "Someone"
     const val LEAGUE_RULES = "Top five go up a league on Monday. In a board of ten or more, the bottom five " +
         "go down. Nobody with zero points holds their place."
+    const val HOW_THIS_WORKS = "How this works"
     const val LEAGUE_HOW_TITLE = "How a league works here"
     const val LEAGUE_HOW = "Twenty people at most, all on the same rung, all playing the same week. You are " +
         "put in one the first time you open this screen — nobody has to be invited, and nobody has to be " +

@@ -108,17 +108,31 @@ fun ResultTile(
     }
 }
 
-/** The headline result, given its own strip so it cannot be mistaken for a detail. */
+/**
+ * The headline result, given its own strip so it cannot be mistaken for a detail.
+ *
+ * [tone] may be null, and on a game score it usually is: clay means *what it costs you*,
+ * and a first attempt at a mini-game is not a cost. Green is kept for a result worth
+ * colouring green.
+ */
 @Composable
 fun TotalStrip(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    tone: Tone = Tone.GOOD,
+    tone: Tone? = Tone.GOOD,
 ) {
     val colors = CashfluentTheme.colors
-    val background = if (tone == Tone.GOOD) colors.growSoft else colors.costSoft
-    val foreground = if (tone == Tone.GOOD) colors.growInk else colors.costInk
+    val background = when (tone) {
+        Tone.GOOD -> colors.growSoft
+        Tone.COST -> colors.costSoft
+        else -> colors.surfaceAlt
+    }
+    val foreground = when (tone) {
+        Tone.GOOD -> colors.growInk
+        Tone.COST -> colors.costInk
+        else -> colors.ink
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()

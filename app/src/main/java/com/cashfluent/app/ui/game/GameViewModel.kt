@@ -15,9 +15,13 @@ import com.cashfluent.app.domain.game.NumberRound
 import com.cashfluent.app.domain.game.Round
 import com.cashfluent.app.domain.game.Scoring
 import com.cashfluent.app.domain.game.game
+import com.cashfluent.app.domain.league.League
+import com.cashfluent.app.domain.league.Standing
+import com.cashfluent.app.domain.league.Zone
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -48,6 +52,20 @@ data class GameState(
 }
 
 /**
+ * The board, as it stands, from the score screen: where you are, who is either side of
+ * you, and what it would take to climb. Null when there is nobody to compare with — a
+ * board of one is not a standing, and saying "1st of 1" would be worse than saying
+ * nothing.
+ */
+data class BoardPeek(
+    val position: Int,
+    val size: Int,
+    val gap: Int?,
+    val zone: Zone,
+    val rows: List<Standing>,
+)
+
+/**
  * One game at a time. The rounds live here rather than on disk on purpose: leaving a
  * game and coming back deals a fresh one, and there is nothing to resume, because the
  * point of a round is the number you have not seen before.
@@ -63,6 +81,22 @@ class GameViewModel : ViewModel() {
     val currency: StateFlow<Currency> = settingsRepository.settings
         .map { it.currency }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Currency.DEFAULT)
+
+    /** Where the points just scored leave you, once there is a board to be left on. */
+    val board: StateFlow<BoardPeek?> = combine(league.player, league.standings) { player, standings ->
+        val you = standings.firstOrNull { it.isYou }
+        if (you == null || standings.size < 2) {
+            null
+        } else {
+            BoardPeek(
+                position = you.position,
+                size = standings.size,
+                gap = League.gapToPromotion(standings, player.id),
+                zone = you.zone,
+                rows = League.around(standings, player.id),
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     /** Deals [gameId]; asking again for the same game keeps the one in play. */
     fun start(gameId: String) {

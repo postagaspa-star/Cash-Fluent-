@@ -1,6 +1,7 @@
 package com.cashfluent.app.ui.games
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,12 +10,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -82,33 +86,55 @@ fun GamesScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 40.dp),
         ) {
+            // The action first: this is a tab you open to play, not to read.
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column {
+                    PrimaryButton(
+                        text = UiStrings.SURPRISE_ME,
+                        onClick = { onOpenGame(viewModel.surprise().id) },
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "${UiStrings.gamesCount(state.played)} played of ${state.total}",
+                        style = CashfluentType.dataSmall,
+                        color = colors.muted,
+                    )
+                    Spacer(Modifier.height(16.dp))
                     Text(
                         text = UiStrings.GAMES_INTRO,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.inkSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.muted,
                     )
+                    Spacer(Modifier.height(20.dp))
+                }
+            }
+
+            item {
+                Column {
+                    // IntrinsicSize.Min plus fillMaxHeight: without it the tile whose label
+                    // wraps at 200% text grows past the two beside it and the row goes ragged.
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         ResultTile(
                             label = UiStrings.WEEK_SHORT,
                             value = UiStrings.points(state.weekPoints),
                             valueColor = colors.grow,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
                         )
                         ResultTile(
                             label = UiStrings.ALL_TIME,
                             value = UiStrings.points(state.totalPoints),
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
                         )
                         Column(
                             modifier = Modifier
                                 .weight(1f)
+                                .fillMaxHeight()
+                                .background(colors.surface, RoundedCornerShape(12.dp))
+                                .border(1.dp, colors.line, RoundedCornerShape(12.dp))
                                 .clickable(role = Role.Button, onClick = onOpenLeague)
-                                .background(colors.surface, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                                 .padding(horizontal = 14.dp, vertical = 12.dp),
                         ) {
                             Text(
@@ -120,23 +146,7 @@ fun GamesScreen(
                             TierBadge(state.tier)
                         }
                     }
-                }
-            }
-
-            item {
-                Column {
-                    Spacer(Modifier.height(16.dp))
-                    PrimaryButton(
-                        text = UiStrings.SURPRISE_ME,
-                        onClick = { onOpenGame(viewModel.surprise().id) },
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "${UiStrings.gamesCount(state.played)} played of ${state.total}",
-                        style = CashfluentType.dataSmall,
-                        color = colors.muted,
-                    )
-                    Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(24.dp))
                 }
             }
 
