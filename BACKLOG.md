@@ -13,29 +13,7 @@ Judged on **Social Impact 40% · Technical Execution 30% · Innovation 20% · De
 
 ---
 
-## 1. Open — blocked on a product decision
-
-### The leagues need a server, and that is a trade, not a detail
-
-Leagues of up to 20 people are decided (§2). Real people in a real league means an
-account, a backend and network access. Firebase's free tier covers the traffic, so cost
-is not the obstacle. What it costs is the claim the app currently makes:
-
-> No account. No server. **No `INTERNET` permission in the manifest.**
-
-That claim is stated in Settings, in About and in the README, and it is the strongest
-single argument available for the 40% category. Going online also brings a privacy
-policy and the handling of minors' data into scope before 1 October.
-
-Two ways forward:
-
-| | What we build | What we give up |
-|---|---|---|
-| **A. Online** | Firebase (Firestore + anonymous auth), account with T&C, leagues of 20 real people | The no-data claim; needs a privacy policy before submission |
-| **B. Offline** | Local points, medals per lesson, comparison against your own history — "340 this week, 210 last week" | Nobody else to measure yourself against, which was the reason for leagues |
-
-Asked in chat on 4 September; **no answer yet.** The mini-games and the points system are
-needed under either option, so they are not blocked by this — the leagues are.
+## 1. Open — waiting on the product owner
 
 ### How the lessons are written
 
@@ -45,46 +23,61 @@ needed under either option, so they are not blocked by this — the leagues are.
 Raised by the product owner, not yet discussed. This is a pass over the copy of all ten
 lessons, not a structural change: the three blocks stay exactly as they are (§4).
 
----
+The developer's position, 5 September: the copy already reads well, and every number in
+it is pinned by a test, so a blind rewrite risks more than it gains. Better to agree what
+"entertaining" means first — one persona carried through all ten lessons, more humour,
+shorter paragraphs, a running example — and then rewrite two lessons as a sample before
+touching the rest.
 
-## 2. Decided, not yet built
+## 2. Built on 5 September — the decisions of §2 as they stood, minus the server
 
-**Mini-games — one per lesson, ten in total.** Each one drills that lesson's actual
-formula rather than testing recall of it. Every lesson already has a verified calculator
-in `domain/finance/`, and the games should be scored against it so a game can never
-disagree with the lesson that taught it. *Paused by the product owner on 4 September —
-resume when told.*
+**Mini-games — one per lesson, ten in total.** `domain/game/drill/`. A game is five
+rounds of that lesson's own formula on numbers the lesson never showed, scored against
+the calculator in `domain/finance/`, so a game can never disagree with the lesson that
+taught it. Two shapes of round only: set a number with a slider, or pick one of a few
+options. Every round ends with the calculation written out — that is the teaching; the
+score is what keeps you playing. Within 5% of the answer is full marks.
 
-**Points.** Earned per game played, held against the account.
+**Points.** Up to 100 a round, 500 a game. Every game played adds to your total and to
+this week's count; the best score per lesson earns a medal (bronze at 200, silver at
+350, gold at 450). Held on the phone, not against an account.
 
-**Leagues of up to 20 people**, Duolingo-style, instead of a worldwide or national
-leaderboard. The product owner's reason, recorded because it is the design constraint:
-points that buy nothing and rank you against nobody are worth nothing. A league of 20 is
-small enough that a place in it is legible.
+**Leagues of up to 20 people, with no server.** This was the open question in the
+previous version of this file (Firebase and accounts, or local-only). What was built is
+neither: your standing is a *card* — one line of text carrying a random id, your
+nickname, your points and your medals. You send it to friends through any app you
+already use; they share it back into Cashfluent, or paste it. The board ranks everyone
+on this week's points and starts again on Monday. The app still has no `INTERNET`
+permission, no account and no privacy policy to write, and the strongest argument for
+the 40% category survives intact.
 
-**Account creation with terms and conditions accepted at sign-up.** The product owner
-judges this sufficient for GDPR and for minors. Only relevant under option A above.
+Why this and not Firebase: an online league costs the no-data claim, a privacy policy,
+the handling of minors' data before 1 October, a sign-up screen in front of a judge who
+has five minutes, and a live dependency that can fail during judging. What it buys is
+automatic updates — which a class group chat provides for free. The honest limit: a card
+is an honour system, like a scoreboard on paper. The checksum catches a mangled paste; it
+does not stop a friend typing themselves a bigger number.
 
----
+**Account creation with terms and conditions.** Not built, and no longer needed: there is
+nothing to create an account for.
 
 ## 3. Still to do before submission
 
 - [ ] **Accessibility pass on a real device** — 200% text size, TalkBack end to end. The
-      charts already carry real `contentDescription`s; nothing has been tested by ear.
+      roles and selected states went in on 5 September; nothing has been tested by ear.
 - [ ] **App icon.** The current one is a marked placeholder. *Product owner's job, not
       the developer's — explicitly.*
-- [ ] **Privacy policy** — only under option A.
-- [ ] **Make the repository public before submitting** — or put the APK somewhere
-      public. The install path in the README goes through Actions artifacts and GitHub
-      releases, and neither is visible to a judge who cannot open a private repository.
+- [x] **Make the repository public** — done 5 September. Keep it so: the install path in
+      the README goes through Actions artifacts and GitHub releases, and neither is
+      visible to a judge on a private repository.
 - [ ] **Devpost page.**
-- [ ] **Demo video, 5 minutes or under.**
+- [ ] **Demo video, 5 minutes or under.** Show a card going from one phone to another
+      through a chat: it is the one thing a judge cannot try alone.
 - [ ] **Refresh the Copy Deck artifact.** It still carries the six original lesson titles
       from before the retitling and the expansion to ten. It is currently wrong.
 - [ ] **Re-render the artboards in `tools/design/`** for the screens that have changed
-      since they were drawn. `Main` is current; the rest predate the ten-lesson list.
-
----
+      since they were drawn. `Main` is current; the rest predate the ten-lesson list, and
+      none of them know about the game or the league.
 
 ## 4. Settled — do not reopen
 
@@ -103,13 +96,19 @@ real formulas and real cases — not a simplified one.
 **Everything unlocked by default**, with an opt-in linear path in Settings. This is the
 inverse of a "judging mode": the app does not hide anything and says why.
 
-**Local only.** Progress and settings in DataStore, on the device, and nothing else
-anywhere. (Option A in §1 is the one thing that would change this.)
+**Local only.** Progress, settings, points, medals and friends' cards in DataStore, on
+the device, and nothing else anywhere.
+
+**Leagues have no server.** A league is the cards on your phone. If that ever changes,
+the privacy note in Settings, the About screen and the README all change with it.
+
+**Games score against the calculators.** A round's answer is computed by the same code
+the lesson's worked example was pinned to. No answer key is ever typed by hand.
 
 **Currency is a symbol, never a conversion.** Content is written with `{c}` where a
 symbol belongs; `Module.inCurrency()` replaces it once, at the screen boundary. Example
 numbers never change with the currency, because converting them at an invented exchange
-rate would make them wrong rather than local.
+rate would make them wrong rather than local. Game rounds carry the same placeholder.
 
 **2-3 check questions per lesson**, each with why the right answer is right *and* why the
 others are wrong.
@@ -134,16 +133,25 @@ Things that have already cost time once.
 
 **The Android SDK is unreachable from the dev container.** `dl.google.com` answers 403
 through the egress proxy and `maven.google.com` does not resolve, so `assembleDebug`
-cannot run locally. **GitHub Actions is the compiler.** Maven Central, the Gradle plugin
-portal, Google Fonts and raw.githubusercontent.com *are* reachable.
+cannot run there. **GitHub Actions is the compiler** from the container. Maven Central,
+the Gradle plugin portal, Google Fonts and raw.githubusercontent.com *are* reachable.
 
-**`tools/verify/` runs the pure-Kotlin half locally** — 94 tests, no Android SDK needed.
-Use it before every push; CI is for the Compose half. See `tools/README.md`.
+**Building on the Windows laptop works.** JDK = the one Android Studio ships
+(`C:\Program Files\Android\Android Studio\jbr`), and SDK platform 35 is installed.
+`local.properties` must use forward slashes — `sdk.dir=C:/Users/.../Android/Sdk` —
+because a Java properties file eats single backslashes and Gradle then fails with
+"Invalid file path". `gradlew.bat testDebugUnitTest assembleDebug` takes about three
+minutes.
 
-**Do not change the git remote.** The repository was renamed to `Cash-Fluent-`, but the
-remote must stay `https://github.com/postagaspa-star/Prova-1-da-cambiare-`. GitHub
-redirects the old URL so push and fetch work; changing it breaks credential injection in
-this environment (`fatal: could not read Username`).
+**`tools/verify/` runs the pure-Kotlin half locally** — the calculators, the games, the
+league cards and the whole curriculum, no Android SDK needed. Use it before every push;
+CI is for the Compose half. See `tools/README.md`.
+
+**Do not change the git remote in the container.** The repository was renamed to
+`Cash-Fluent-`, but the container's remote must stay
+`https://github.com/postagaspa-star/Prova-1-da-cambiare-`. GitHub redirects the old URL
+so push and fetch work; changing it breaks credential injection there (`fatal: could not
+read Username`). The laptop clone uses the new name directly.
 
 **Every build says which build it is.** `versionCode` is the CI run number, Settings
 shows `Cashfluent 1.0.<run> (<sha>)`, and the artifact is `cashfluent-apk-<run>`. When
@@ -157,9 +165,14 @@ certificates — so a newer APK refused to install over an older one until the a
 uninstalled, which also wiped the progress. The key signs debug builds only; never reuse
 it for a release.
 
+**A shared-in card is untrusted text.** It arrives through `ACTION_SEND`, is cut at
+20,000 characters before it is read, and every field is bounded before it is believed —
+see `LeagueCards.decode`. Nothing else enters the app from outside.
+
 **Semantic colour, and it means something.** Green is what you keep, clay is what it
 costs you, brass is where to look next. Material You dynamic colour is deliberately off:
 a phone's wallpaper must not be able to recolour a chart whose colours carry meaning.
+Medals borrow from the same palette: gold is brass, silver the quiet grey, bronze the clay.
 
 **Verify every number in Python before it becomes copy, then pin it as a test
 expectation.** That is why the worked examples and the calculators cannot drift apart.
