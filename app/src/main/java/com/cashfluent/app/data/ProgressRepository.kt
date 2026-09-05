@@ -34,12 +34,22 @@ class ProgressRepository(private val context: Context) {
         }
     }
 
-    suspend fun recordAnswer(moduleId: String, questionIndex: Int, optionIndex: Int) {
+    /**
+     * Records the pick and, once every one of [questionCount] questions has an answer,
+     * marks the module done — in the same transaction. Deciding that from a snapshot of
+     * UI state instead could miss a tap that landed before the previous write had come
+     * back round through the flow, and leave a finished module showing as open.
+     */
+    suspend fun recordAnswer(moduleId: String, questionIndex: Int, optionIndex: Int, questionCount: Int) {
         context.progressStore.edit { prefs ->
             val key = answersKey(moduleId)
             val kept = (prefs[key] ?: emptySet())
                 .filterNot { it.substringBefore(ENTRY_SEPARATOR) == questionIndex.toString() }
-            prefs[key] = (kept + "$questionIndex$ENTRY_SEPARATOR$optionIndex").toSet()
+            val answers = (kept + "$questionIndex$ENTRY_SEPARATOR$optionIndex").toSet()
+            prefs[key] = answers
+            if (answers.size >= questionCount) {
+                prefs[statusKey(moduleId)] = ModuleStatus.DONE.name
+            }
         }
     }
 

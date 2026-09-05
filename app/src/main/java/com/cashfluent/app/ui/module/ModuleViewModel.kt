@@ -44,26 +44,32 @@ class ModuleViewModel : ViewModel() {
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ModuleUiState())
 
-    /** Opening a module marks it started; re-binding the same id does nothing. */
+    /**
+     * Opening a module marks it started; re-binding the same id does nothing. An id that
+     * matches no module is shown as empty and is never written to the store.
+     */
     fun bind(id: String) {
         if (moduleId.value == id) return
         moduleId.value = id
+        if (Modules.byId(id) == null) return
         viewModelScope.launch { progressRepository.markStarted(id) }
     }
 
     /**
      * Answers can be changed as often as you like — there is no score to protect. The
      * module is marked done once every question has an answer, right or wrong, because
-     * the explanation is what the check is for.
+     * the explanation is what the check is for. The repository decides that from what is
+     * actually stored, so two quick taps cannot leave a finished module marked open.
      */
     fun answer(questionIndex: Int, optionIndex: Int) {
         val module = state.value.module ?: return
         viewModelScope.launch {
-            progressRepository.recordAnswer(module.id, questionIndex, optionIndex)
-            val answered = state.value.answers.keys + questionIndex
-            if (answered.size >= module.check.size) {
-                progressRepository.markDone(module.id)
-            }
+            progressRepository.recordAnswer(
+                moduleId = module.id,
+                questionIndex = questionIndex,
+                optionIndex = optionIndex,
+                questionCount = module.check.size,
+            )
         }
     }
 }
