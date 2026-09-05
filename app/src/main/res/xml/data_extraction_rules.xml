@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Progress and settings are the only things stored, and they are safe to carry to a new
+  phone. They live in Preferences DataStore files under files/datastore/, not in
+  SharedPreferences, so that is the directory named here.
+-->
 <data-extraction-rules>
     <cloud-backup>
-        <include domain="sharedpref" path="." />
+        <include domain="file" path="datastore/" />
     </cloud-backup>
     <device-transfer>
-        <include domain="sharedpref" path="." />
+        <include domain="file" path="datastore/" />
     </device-transfer>
 </data-extraction-rules>
