@@ -2,7 +2,6 @@ package com.cashfluent.app.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -55,7 +56,10 @@ fun QuestionCard(
         )
         Spacer(Modifier.height(16.dp))
 
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(
+            modifier = Modifier.selectableGroup(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             question.options.forEachIndexed { optionIndex, option ->
                 val isCorrect = optionIndex == question.correctIndex
                 val isPicked = selected == optionIndex
@@ -91,7 +95,8 @@ fun QuestionCard(
                             color = border,
                             shape = RoundedCornerShape(12.dp),
                         )
-                        .clickable(role = Role.RadioButton) { onSelect(optionIndex) }
+                        // selectable rather than clickable, so TalkBack says which option is picked.
+                        .selectable(selected = isPicked, role = Role.RadioButton) { onSelect(optionIndex) }
                         .padding(horizontal = 14.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

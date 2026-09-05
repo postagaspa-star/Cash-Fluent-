@@ -23,10 +23,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.cashfluent.app.content.ExampleStep
 import com.cashfluent.app.content.Tone
+import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.content.Variable
 import com.cashfluent.app.domain.finance.Currency
 import com.cashfluent.app.domain.finance.Money
@@ -241,17 +246,27 @@ fun Pill(text: String, foreground: Color, background: Color, modifier: Modifier 
     )
 }
 
-/** Back arrow drawn rather than imported, so the app pulls in no icon dependency. */
+/**
+ * Back arrow drawn rather than imported, so the app pulls in no icon dependency. The
+ * glyph means nothing to a screen reader, so the button carries its own name and the
+ * arrow itself is silent.
+ */
 @Composable
 fun BackButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     val colors = CashfluentTheme.colors
     Box(
         modifier = modifier
             .size(48.dp)
-            .clickable(onClick = onClick),
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics { contentDescription = UiStrings.BACK },
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = "←", style = MaterialTheme.typography.titleLarge, color = colors.muted)
+        Text(
+            text = "←",
+            style = MaterialTheme.typography.titleLarge,
+            color = colors.muted,
+            modifier = Modifier.clearAndSetSemantics {},
+        )
     }
 }
 

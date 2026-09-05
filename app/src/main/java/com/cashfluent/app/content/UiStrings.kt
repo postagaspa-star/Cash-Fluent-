@@ -45,6 +45,7 @@ object UiStrings {
     const val ACTION = "One thing to do this week"
     const val UP_NEXT = "Up next"
     const val BACK_TO_ALL = "Back to all modules"
+    const val BACK = "Back"
 
     // Check
     const val WHY = "Why"

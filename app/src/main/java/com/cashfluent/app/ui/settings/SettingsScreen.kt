@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
@@ -32,6 +34,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -116,7 +122,7 @@ fun SettingsScreen(
                     Box(
                         modifier = Modifier
                             .heightIn(min = 48.dp)
-                            .clickable { confirmingReset = true }
+                            .clickable(role = Role.Button) { confirmingReset = true }
                             .padding(horizontal = 4.dp),
                         contentAlignment = Alignment.Center,
                     ) {
@@ -139,7 +145,7 @@ fun SettingsScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(onClick = onOpenAbout)
+                        .clickable(role = Role.Button, onClick = onOpenAbout)
                         .padding(vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -238,7 +244,8 @@ private fun CurrencyPicker(selected: Currency, onSelect: (Currency) -> Unit) {
     Row(
         modifier = Modifier
             .border(1.dp, colors.lineStrong, RoundedCornerShape(10.dp))
-            .height(48.dp),
+            .height(48.dp)
+            .selectableGroup(),
     ) {
         Currency.entries.forEach { currency ->
             val isSelected = currency == selected
@@ -246,13 +253,16 @@ private fun CurrencyPicker(selected: Currency, onSelect: (Currency) -> Unit) {
                 modifier = Modifier
                     .size(width = 44.dp, height = 48.dp)
                     .background(if (isSelected) colors.grow else colors.surface)
-                    .clickable { onSelect(currency) },
+                    // A screen reader gets "EUR, selected" rather than "euro sign".
+                    .selectable(selected = isSelected, role = Role.RadioButton) { onSelect(currency) }
+                    .semantics { contentDescription = currency.code },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = currency.symbol,
                     style = CashfluentType.data,
                     color = if (isSelected) colors.paper else colors.muted,
+                    modifier = Modifier.clearAndSetSemantics {},
                 )
             }
         }

@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -169,7 +170,7 @@ private fun TopAction(text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .heightIn(min = 48.dp)
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -188,7 +189,7 @@ private fun HeroCard(row: HomeModuleRow, onClick: () -> Unit) {
             .fillMaxWidth()
             .background(colors.surface, RoundedCornerShape(16.dp))
             .border(1.dp, colors.line, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(20.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -268,7 +269,7 @@ private fun LessonRow(row: HomeModuleRow, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = row.unlocked, onClick = onClick)
+            .clickable(enabled = row.unlocked, role = Role.Button, onClick = onClick)
             .padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
@@ -328,7 +329,7 @@ private fun MethodStrip(onDismiss: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.End)
                 .heightIn(min = 44.dp)
-                .clickable(onClick = onDismiss)
+                .clickable(role = Role.Button, onClick = onDismiss)
                 .padding(horizontal = 4.dp),
             contentAlignment = Alignment.Center,
         ) {
