@@ -31,29 +31,3 @@ object Scoring {
     fun choice(round: ChoiceRound, picked: Int): Int =
         if (picked == round.correctIndex) MAX_ROUND else 0
 }
-
-/**
- * What a best score on a lesson's game earns. Thresholds are on the game total, out of
- * [GameRules.MAX_SCORE].
- */
-enum class Medal {
-    NONE, BRONZE, SILVER, GOLD;
-
-    companion object {
-        const val BRONZE_AT = 200
-        const val SILVER_AT = 350
-        const val GOLD_AT = 450
-
-        fun forScore(best: Int): Medal = when {
-            best >= GOLD_AT -> GOLD
-            best >= SILVER_AT -> SILVER
-            best >= BRONZE_AT -> BRONZE
-            else -> NONE
-        }
-
-        /** Stored and shared as one digit per lesson; anything unexpected reads as NONE. */
-        fun fromDigit(digit: Char): Medal = entries.getOrNull(digit - '0') ?: NONE
-    }
-
-    val digit: Char get() = '0' + ordinal
-}

@@ -47,30 +47,6 @@ class ScoringTest {
     }
 
     @Test
-    fun `a game is five rounds out of five hundred`() {
-        assertEquals(5, GameRules.ROUNDS)
-        assertEquals(500, GameRules.MAX_SCORE)
-    }
-
-    @Test
-    fun `medals sit on the thresholds`() {
-        assertEquals(Medal.NONE, Medal.forScore(0))
-        assertEquals(Medal.NONE, Medal.forScore(199))
-        assertEquals(Medal.BRONZE, Medal.forScore(200))
-        assertEquals(Medal.BRONZE, Medal.forScore(349))
-        assertEquals(Medal.SILVER, Medal.forScore(350))
-        assertEquals(Medal.GOLD, Medal.forScore(450))
-        assertEquals(Medal.GOLD, Medal.forScore(500))
-    }
-
-    @Test
-    fun `a medal survives a trip through one digit, and nonsense reads as none`() {
-        Medal.entries.forEach { assertEquals(it, Medal.fromDigit(it.digit)) }
-        assertEquals(Medal.NONE, Medal.fromDigit('x'))
-        assertEquals(Medal.NONE, Medal.fromDigit('9'))
-    }
-
-    @Test
     fun `a round refuses an answer outside its own slider`() {
         val thrown = runCatching {
             NumberRound("p", Quantity.AMOUNT, truth = 3.0, min = 0.0, max = 2.0, step = 0.1, explanation = "e")
