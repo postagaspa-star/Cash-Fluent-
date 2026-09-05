@@ -65,6 +65,10 @@ To check which build you are actually running, open **Settings** in the app: the
 the bottom reads `Cashfluent 1.0.<run> (<commit>)`. It matches the run number in the
 Actions URL, so there is never any doubt about whether an update took.
 
+A newer build installs straight over an older one, progress intact: every build — on CI
+or on a laptop — is signed with the same debug key, committed at `app/debug.keystore`.
+That key signs debug builds only.
+
 A tagged release (`v*`) also attaches the APK to a GitHub release, which is the link to
 hand to someone without a GitHub account.
 

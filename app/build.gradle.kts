@@ -27,6 +27,21 @@ android {
         vectorDrawables { useSupportLibrary = true }
     }
 
+    // Debug builds are signed with the key committed at app/debug.keystore, not with
+    // whatever ~/.android/debug.keystore happens to exist on the machine. A fresh CI
+    // runner generates a new random key on every run, and Android refuses to install an
+    // APK over one signed with a different key — so each build from Actions demanded an
+    // uninstall first, and took the progress with it. The key signs debug builds only;
+    // the password is the public Android default.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false

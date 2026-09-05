@@ -74,6 +74,9 @@ judges this sufficient for GDPR and for minors. Only relevant under option A abo
 - [ ] **App icon.** The current one is a marked placeholder. *Product owner's job, not
       the developer's — explicitly.*
 - [ ] **Privacy policy** — only under option A.
+- [ ] **Make the repository public before submitting** — or put the APK somewhere
+      public. The install path in the README goes through Actions artifacts and GitHub
+      releases, and neither is visible to a judge who cannot open a private repository.
 - [ ] **Devpost page.**
 - [ ] **Demo video, 5 minutes or under.**
 - [ ] **Refresh the Copy Deck artifact.** It still carries the six original lesson titles
@@ -146,6 +149,13 @@ this environment (`fatal: could not read Username`).
 shows `Cashfluent 1.0.<run> (<sha>)`, and the artifact is `cashfluent-apk-<run>`. When
 "the APK looks unchanged" comes up, check that line first — the one time it came up it
 was an old download, not a failed build.
+
+**Every build is signed with the same key.** `app/debug.keystore` is committed on
+purpose and wired up in `app/build.gradle.kts`. Before that, each CI run signed with a
+fresh random debug key — runs 9 and 10 were checked and carried two different
+certificates — so a newer APK refused to install over an older one until the app was
+uninstalled, which also wiped the progress. The key signs debug builds only; never reuse
+it for a release.
 
 **Semantic colour, and it means something.** Green is what you keep, clay is what it
 costs you, brass is where to look next. Material You dynamic colour is deliberately off:

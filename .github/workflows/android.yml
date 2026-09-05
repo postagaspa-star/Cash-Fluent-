@@ -3,8 +3,16 @@ name: Build
 on:
   push:
     branches: ["**"]
+    # A `branches` filter on its own silently leaves tag pushes out, so without this
+    # line the release job at the bottom could never run.
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
+
+# The build job only reads the repository. The release job asks for write access on
+# its own, and only when a tag is being published.
+permissions:
+  contents: read
 
 # Never cancel a run in flight: the APK it is about to upload is a deliverable,
 # and a cancelled run leaves no artifact behind at all.

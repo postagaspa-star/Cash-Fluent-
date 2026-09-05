@@ -16,3 +16,7 @@ tools/design/out/
 *.apk
 *.aab
 *.keystore
+# The one exception: the DEBUG signing key is committed on purpose, so every build —
+# CI or local — carries the same signature and a new APK installs over the old one.
+# It signs debug builds only; the password is the public Android default.
+!app/debug.keystore
