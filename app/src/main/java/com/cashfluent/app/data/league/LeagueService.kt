@@ -86,9 +86,10 @@ class LeagueService(
         if (!player.seated) {
             val leagueId = attempt { backend.takeSeat(week, player.tier, player.entrant) } ?: return player
             player = store.update { it.copy(leagueId = leagueId) }
-        } else {
-            publish(player)
         }
+        // One place writes rows, and it is this one — including the first row on a board that
+        // was opened a moment ago, which is why taking a seat does not write it.
+        publish(player)
         player
     }
 

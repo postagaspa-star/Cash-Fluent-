@@ -68,7 +68,8 @@ class FakeLeagueBackend : LeagueBackend {
             }
             else -> lobby.league.also { lobby.seats++ }
         }
-        publish(leagueId, me)
+        // The row is not written here, exactly as in Firestore: a rule cannot read a league
+        // created in the same commit, so the service writes the row once the seat is taken.
         return leagueId
     }
 
