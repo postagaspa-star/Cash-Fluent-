@@ -1,0 +1,22 @@
+*.iml
+.gradle/
+.kotlin/
+/.idea/
+.DS_Store
+
+# Build output, wherever it is — not just at the root. tools/ has its own Gradle
+# build, and an anchored /build rule silently misses it.
+build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+node_modules/
+tools/design/out/
+*.apk
+*.aab
+*.keystore
+# The one exception: the DEBUG signing key is committed on purpose, so every build —
+# CI or local — carries the same signature and a new APK installs over the old one.
+# It signs debug builds only; the password is the public Android default.
+!app/debug.keystore

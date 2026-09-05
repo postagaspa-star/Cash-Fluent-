@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!--
+      Progress and settings are the only things stored, and they are safe to restore.
+      They live in Preferences DataStore files under files/datastore/, not in
+      SharedPreferences, so that is the directory named here. The old "sharedpref"
+      rule matched nothing, and a new phone silently started from zero.
+    -->
+    <include domain="file" path="datastore/" />
+</full-backup-content>

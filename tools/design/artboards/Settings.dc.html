@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; }
+    a { color: #0E6B54; text-decoration: none; }
+    a:hover { color: #0A5442; }
+  </style>
+</helmet>
+
+<div style="width:360px;height:800px;background:#F4F6F3;color:#101A17;display:flex;flex-direction:column;overflow:hidden;">
+
+  <div style="height:26px;flex:none;"></div>
+
+  <div style="display:flex;align-items:center;gap:2px;padding:0 12px 0 4px;height:52px;flex:none;">
+    <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#6C7A75;flex:none;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </div>
+    <div style="font-size:15px;font-weight:700;letter-spacing:-0.02em;">Settings</div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;padding:0 16px;overflow:hidden;">
+
+    <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6C7A75;margin:10px 0 4px;">Display</div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #DBE3DC;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;">Currency symbol</div>
+        <div style="font-size:12px;line-height:1.45;color:#6C7A75;margin-top:3px;">Changes the symbol only — the example numbers stay the same</div>
+      </div>
+      <div style="display:flex;border:1px solid #C6D2C8;border-radius:10px;overflow:hidden;flex:none;">
+        <div style="width:40px;height:44px;display:flex;align-items:center;justify-content:center;background:#0E6B54;color:#FFFFFF;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:14px;font-weight:600;">$</div>
+        <div style="width:40px;height:44px;display:flex;align-items:center;justify-content:center;color:#6C7A75;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:14px;">€</div>
+        <div style="width:40px;height:44px;display:flex;align-items:center;justify-content:center;color:#6C7A75;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:14px;">£</div>
+      </div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6C7A75;margin:22px 0 4px;">Learning</div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #DBE3DC;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;">Guided path</div>
+        <div style="font-size:12px;line-height:1.45;color:#6C7A75;margin-top:3px;">Unlock modules one at a time, in order. Off means everything is open</div>
+      </div>
+      <div style="position:relative;width:46px;height:27px;border-radius:14px;background:#EAEFE9;border:1px solid #C6D2C8;flex:none;">
+        <div style="position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#6C7A75;"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #DBE3DC;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;">Reset progress</div>
+        <div style="font-size:12px;line-height:1.45;color:#6C7A75;margin-top:3px;">Clears which modules you've finished. Nothing else is stored</div>
+      </div>
+      <div style="height:44px;display:flex;align-items:center;font-size:13px;font-weight:600;color:#A34527;flex:none;">Reset</div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6C7A75;margin:22px 0 4px;">About</div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #DBE3DC;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;">Why Cashfluent exists</div>
+        <div style="font-size:12px;line-height:1.45;color:#6C7A75;margin-top:3px;">The problem, the method, and what this app is not</div>
+      </div>
+      <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#6C7A75;flex:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+      </div>
+    </div>
+
+    <div style="background:#EAEFE9;border-radius:12px;padding:14px 15px;margin-top:22px;">
+      <div style="font-size:12.5px;line-height:1.6;color:#394943;">No account. No ads. No tracking. Nothing you type here leaves your phone — there is no server to send it to.</div>
+    </div>
+
+    <div style="margin-top:auto;padding:16px 0 18px;text-align:center;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:10px;color:#6C7A75;">Cashfluent 1.0 · GatewayHacks 2026</div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

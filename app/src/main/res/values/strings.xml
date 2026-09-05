@@ -1,0 +1,8 @@
+<resources>
+    <!--
+      Only the launcher label lives here. Every other string in the app is typed Kotlin
+      in the content/ package, so a wrong key fails at compile time instead of shipping
+      as a blank line on screen.
+    -->
+    <string name="app_name">Cashfluent</string>
+</resources>

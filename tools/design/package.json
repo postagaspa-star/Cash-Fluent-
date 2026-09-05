@@ -1,0 +1,11 @@
+{
+  "name": "cashfluent-artboards",
+  "private": true,
+  "description": "Renders the design artboards to PNG at a true phone viewport.",
+  "scripts": {
+    "shoot": "node shoot.js"
+  },
+  "dependencies": {
+    "playwright-core": "^1.62.1"
+  }
+}

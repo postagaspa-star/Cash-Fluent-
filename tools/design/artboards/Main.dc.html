@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; }
+    a { color: #0E6B54; text-decoration: none; }
+    a:hover { color: #0A5442; }
+  </style>
+</helmet>
+
+<div style="width:360px;height:800px;background:#F4F6F3;color:#101A17;display:flex;flex-direction:column;overflow:hidden;">
+
+  <!-- room left for the real Android status bar -->
+  <div style="height:26px;flex:none;"></div>
+
+  <!-- header -->
+  <div style="display:flex;align-items:center;padding:0 8px 0 16px;height:48px;flex:none;">
+    <div style="flex:1;font-size:22px;font-weight:700;letter-spacing:-0.02em;">Cash<span style="color:#0E6B54;">fluent</span></div>
+    <div style="height:48px;display:flex;align-items:center;padding:0 10px;font-size:12.5px;color:#6C7A75;">Why</div>
+    <div style="height:48px;display:flex;align-items:center;padding:0 10px;font-size:12.5px;color:#6C7A75;">Settings</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;padding:4px 16px 16px;flex:none;">
+    <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;">2 of 10 done</div>
+    <div style="flex:1;height:6px;border-radius:3px;background:#EAEFE9;overflow:hidden;">
+      <div style="width:20%;height:100%;border-radius:3px;background:#0E6B54;"></div>
+    </div>
+  </div>
+  <div style="height:1px;background:#DBE3DC;flex:none;"></div>
+
+  <div style="flex:1;display:flex;flex-direction:column;padding:20px 16px 0;overflow:hidden;">
+
+    <!-- method strip: quiet, and gone for good once dismissed -->
+    <div style="background:#EAEFE9;border-radius:12px;padding:14px 16px;margin-bottom:28px;">
+      <div style="font-size:13px;color:#101A17;">Every module has three parts</div>
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;margin-top:5px;">① the idea &nbsp;&nbsp; ② the formula &nbsp;&nbsp; ③ real numbers</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:2px;">
+        <div style="height:40px;display:flex;align-items:center;font-size:12.5px;color:#0E6B54;">Got it</div>
+      </div>
+    </div>
+
+    <!-- the one thing on the screen meant to be tapped -->
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#7A5A12;margin-bottom:10px;">Start here</div>
+
+    <div style="background:#FFFFFF;border:1px solid #DBE3DC;border-radius:16px;padding:20px;margin-bottom:32px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;font-weight:600;color:#7A5A12;background:#F6EBD1;border-radius:8px;padding:5px 8px;">03</div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;">7 min</div>
+      </div>
+      <div style="font-size:22px;font-weight:600;letter-spacing:-0.02em;margin-top:14px;">Good debt, bad debt</div>
+      <div style="font-size:14px;line-height:1.5;color:#6C7A75;margin-top:8px;">Debt isn't evil. It has a price, and nobody shows you the tag</div>
+      <div style="height:52px;background:#0E6B54;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-top:20px;">
+        <div style="font-size:14px;color:#F4F6F3;">Start this lesson</div>
+      </div>
+    </div>
+
+    <!-- everything else: quiet, one line each -->
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6C7A75;margin-bottom:4px;">All lessons</div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#0E6B54;width:20px;">01</div>
+      <div style="flex:1;font-size:14px;">Budgeting</div>
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#0A5442;background:#DCEFE7;border-radius:999px;padding:3px 9px;">done</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#0E6B54;width:20px;">02</div>
+      <div style="flex:1;font-size:14px;">Compound interest</div>
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#0A5442;background:#DCEFE7;border-radius:999px;padding:3px 9px;">done</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#7A5A12;width:20px;">03</div>
+      <div style="flex:1;font-size:14px;">Good debt, bad debt</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;width:20px;">04</div>
+      <div style="flex:1;font-size:14px;">Saving vs investing</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;width:20px;">05</div>
+      <div style="flex:1;font-size:14px;">Shares and funds</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;width:20px;">06</div>
+      <div style="flex:1;font-size:14px;">Gross vs net pay</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;width:20px;">07</div>
+      <div style="flex:1;font-size:14px;">Buy now, pay later</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;width:20px;">08</div>
+      <div style="flex:1;font-size:14px;">Your credit record</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;width:20px;">09</div>
+      <div style="flex:1;font-size:14px;">Tax nobody deducts for you</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;">
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:11px;color:#6C7A75;width:20px;">10</div>
+      <div style="flex:1;font-size:14px;">Rent or buy</div>
+    </div>
+    <div style="height:1px;background:#DBE3DC;"></div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

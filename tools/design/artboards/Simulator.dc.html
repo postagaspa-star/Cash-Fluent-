@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; }
+    a { color: #0E6B54; text-decoration: none; }
+    a:hover { color: #0A5442; }
+  </style>
+</helmet>
+
+<div style="width:360px;height:800px;background:#F4F6F3;color:#101A17;display:flex;flex-direction:column;overflow:hidden;">
+
+  <div style="height:26px;flex:none;"></div>
+
+  <div style="display:flex;align-items:center;gap:2px;padding:0 12px 0 4px;height:52px;flex:none;">
+    <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#6C7A75;flex:none;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </div>
+    <div style="font-size:13px;font-weight:600;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">02 · Why time beats the amount</div>
+  </div>
+
+  <div style="display:flex;gap:4px;padding:0 16px 14px;flex:none;">
+    <div style="flex:1;height:4px;border-radius:2px;background:#0E6B54;"></div>
+    <div style="flex:1;height:4px;border-radius:2px;background:#0E6B54;"></div>
+    <div style="flex:1;height:4px;border-radius:2px;background:#0E6B54;"></div>
+    <div style="flex:1;height:4px;border-radius:2px;background:#0E6B54;"></div>
+    <div style="flex:1;height:4px;border-radius:2px;background:#C6D2C8;"></div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;padding:0 16px;overflow:hidden;">
+
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#7A5A12;margin-bottom:12px;">Try it with your numbers</div>
+
+    <!-- sliders -->
+    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;">
+
+      <div>
+        <div style="display:flex;align-items:baseline;">
+          <div style="font-size:13px;color:#394943;flex:1;">Monthly amount</div>
+          <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:14px;font-weight:600;">100</div>
+        </div>
+        <div style="position:relative;height:22px;margin-top:2px;">
+          <div style="position:absolute;top:50%;left:0;right:0;height:6px;border-radius:3px;background:#EAEFE9;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:0;width:18.4%;height:6px;border-radius:3px;background:#0E6B54;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:18.4%;width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:2.5px solid #0E6B54;transform:translate(-50%,-50%);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9.5px;color:#6C7A75;">
+          <span>10</span><span>500</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:baseline;">
+          <div style="font-size:13px;color:#394943;flex:1;">Start at age</div>
+          <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:14px;font-weight:600;">18</div>
+        </div>
+        <div style="position:relative;height:22px;margin-top:2px;">
+          <div style="position:absolute;top:50%;left:0;right:0;height:6px;border-radius:3px;background:#EAEFE9;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:0;width:8.3%;height:6px;border-radius:3px;background:#0E6B54;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:8.3%;width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:2.5px solid #0E6B54;transform:translate(-50%,-50%);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9.5px;color:#6C7A75;">
+          <span>16</span><span>40</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:baseline;">
+          <div style="font-size:13px;color:#394943;flex:1;">Stop paying at age</div>
+          <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:14px;font-weight:600;">28</div>
+        </div>
+        <div style="position:relative;height:22px;margin-top:2px;">
+          <div style="position:absolute;top:50%;left:0;right:0;height:6px;border-radius:3px;background:#EAEFE9;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:0;width:22%;height:6px;border-radius:3px;background:#0E6B54;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:22%;width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:2.5px solid #0E6B54;transform:translate(-50%,-50%);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9.5px;color:#6C7A75;">
+          <span>19</span><span>60</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:baseline;">
+          <div style="font-size:13px;color:#394943;flex:1;">Yearly return</div>
+          <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:14px;font-weight:600;">7.0%</div>
+        </div>
+        <div style="position:relative;height:22px;margin-top:2px;">
+          <div style="position:absolute;top:50%;left:0;right:0;height:6px;border-radius:3px;background:#EAEFE9;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:0;width:62.5%;height:6px;border-radius:3px;background:#0E6B54;transform:translateY(-50%);"></div>
+          <div style="position:absolute;top:50%;left:62.5%;width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:2.5px solid #0E6B54;transform:translate(-50%,-50%);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9.5px;color:#6C7A75;">
+          <span>2%</span><span>10%</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- chart -->
+    <div style="display:flex;gap:16px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:14px;height:3px;border-radius:2px;background:#0E6B54;"></div>
+        <div style="font-size:11px;color:#6C7A75;">what it's worth</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:14px;height:3px;border-radius:2px;background:#6C7A75;"></div>
+        <div style="font-size:11px;color:#6C7A75;">what you put in</div>
+      </div>
+    </div>
+    <svg viewBox="0 0 296 126" width="100%" height="102" style="display:block;margin-bottom:14px;" role="img" aria-label="From age 18 to 58 what you put in stays flat at 12,000 after you stop paying at 28, while the total value keeps climbing to 131,757.">
+      <defs>
+        <linearGradient id="grow-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0E6B54" stop-opacity="0.26"></stop>
+          <stop offset="100%" stop-color="#0E6B54" stop-opacity="0"></stop>
+        </linearGradient>
+      </defs>
+      <line x1="0" y1="54" x2="296" y2="54" stroke="#DBE3DC" stroke-width="1" stroke-dasharray="3 5"></line>
+      <line x1="0" y1="108" x2="296" y2="108" stroke="#C6D2C8" stroke-width="1"></line>
+      <polygon points="0,108 37,102.5 74,94.65 111,89.3 148,81.7 185,71.2 222,56.3 259,35.5 296,6.4 296,108" fill="url(#grow-fill)"></polygon>
+      <polyline points="0,108 74,98.7 296,98.7" fill="none" stroke="#6C7A75" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round"></polyline>
+      <polyline points="0,108 37,102.5 74,94.65 111,89.3 148,81.7 185,71.2 222,56.3 259,35.5 296,6.4" fill="none" stroke="#0E6B54" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <circle cx="296" cy="6.4" r="3.6" fill="#0E6B54"></circle>
+      <text x="0" y="122" font-family="IBM Plex Mono, monospace" font-size="9" fill="#6C7A75">age 18</text>
+      <text x="127" y="122" font-family="IBM Plex Mono, monospace" font-size="9" fill="#6C7A75">stopped at 28</text>
+      <text x="264" y="122" font-family="IBM Plex Mono, monospace" font-size="9" fill="#6C7A75">age 58</text>
+    </svg>
+
+    <!-- results -->
+    <div style="display:flex;gap:9px;margin-bottom:9px;">
+      <div style="flex:1;background:#FFFFFF;border:1px solid #DBE3DC;border-radius:12px;padding:10px 12px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.06em;text-transform:uppercase;color:#6C7A75;margin-bottom:3px;">You put in</div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:19px;font-weight:600;letter-spacing:-0.03em;">12,000</div>
+      </div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #DBE3DC;border-radius:12px;padding:10px 12px;">
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:9px;letter-spacing:0.06em;text-transform:uppercase;color:#6C7A75;margin-bottom:3px;">Time added</div>
+        <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:19px;font-weight:600;letter-spacing:-0.03em;color:#0E6B54;">119,757</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;background:#DCEFE7;border-radius:12px;padding:13px 14px;margin-bottom:12px;">
+      <div style="font-size:12.5px;font-weight:600;color:#0A5442;flex:1;">Total at 58</div>
+      <div style="font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace;font-size:23px;font-weight:600;letter-spacing:-0.04em;color:#0A5442;">131,757</div>
+    </div>
+
+    <div style="background:#F0F3EF;border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.55;color:#394943;">At 7%, 100 a month from 18 to 28 becomes <span style="font-weight:600;color:#101A17;">131,757</span> by age 58 — even though you stopped paying 30 years earlier.</div>
+
+    <div style="height:40px;display:flex;align-items:center;font-size:12.5px;font-weight:600;color:#0E6B54;">Reset to the example</div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

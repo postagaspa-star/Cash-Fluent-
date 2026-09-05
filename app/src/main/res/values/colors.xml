@@ -1,0 +1,5 @@
+<resources>
+    <!-- Only what the window needs before Compose takes over. The real palette is Color.kt. -->
+    <color name="paper">#F4F6F3</color>
+    <color name="launcher_background">#0E6B54</color>
+</resources>

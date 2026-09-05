@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PLACEHOLDER ICON. Two brackets, because the app's claim is "we show you how it works",
+  not "get rich". The final icon is the product owner's call and replaces this file.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,32h12v6h-6v32h6v6h-12z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M74,32h-12v6h6v32h-6v6h12z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,50h8v4h-8z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,58h8v4h-8z" />
+</vector>
