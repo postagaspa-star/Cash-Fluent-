@@ -18,10 +18,12 @@ class TierTest {
     }
 
     @Test
-    fun `a rung survives a trip through one digit, and nonsense reads as wood`() {
-        Tier.entries.forEach { assertEquals(it, Tier.fromDigit(it.digit)) }
-        assertEquals(Tier.WOOD, Tier.fromDigit('9'))
+    fun `a rung survives being stored, and nonsense reads as wood`() {
+        Tier.entries.forEach { assertEquals(it, Tier.fromName(it.name)) }
+        Tier.entries.forEach { assertEquals(it, Tier.fromOrdinal(it.ordinal)) }
         assertEquals(Tier.WOOD, Tier.fromName(null))
+        assertEquals(Tier.WOOD, Tier.fromName("PLATINUM"))
+        assertEquals(Tier.WOOD, Tier.fromOrdinal(99))
         assertEquals(Tier.RUBY, Tier.fromName("RUBY"))
     }
 

@@ -8,7 +8,11 @@ plugins { kotlin("jvm") version "2.1.0" }
 
 repositories { mavenCentral() }
 
-dependencies { testImplementation("junit:junit:4.13.2") }
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+}
 
 val repo = rootDir.parentFile.parentFile
 
@@ -17,10 +21,13 @@ kotlin {
     sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/domain/game"))
     sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/domain/league"))
     sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/content"))
+    sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/data/model"))
+    sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/data/league"))
     sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/domain/finance"))
     sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/domain/game"))
     sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/domain/league"))
     sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/content"))
+    sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/data/league"))
 }
 
 tasks.test {

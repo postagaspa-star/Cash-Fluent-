@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-      Deliberately empty of permissions. Cashfluent has no INTERNET permission because
-      it makes no network calls: there is no account, no analytics and no server to send
-      anything to. The absence of this line is a product decision, not an oversight.
+      One permission, and only the league uses it: an anonymous id and a board of twenty
+      names and scores. The lessons, the games, the simulators, the settings and every
+      answer anyone types work with it switched off and never leave the phone.
     -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".CashfluentApp"
@@ -26,16 +28,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <!--
-              League cards arrive as plain text shared from any messaging app. Receiving a
-              share needs no permission: the other app hands the text over, this one reads
-              it as a card or ignores it. Still no INTERNET.
-            -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
     </application>
