@@ -18,6 +18,8 @@ data class ModuleUiState(
     val answers: Map<Int, Int> = emptyMap(),
     val currency: Currency = Currency.DEFAULT,
     val isDone: Boolean = false,
+    /** Best score on this lesson's game, out of [com.cashfluent.app.domain.game.GameRules.MAX_SCORE]. */
+    val best: Int = 0,
 ) {
     val allAnswered: Boolean
         get() = module != null && answers.size >= module.check.size
@@ -27,6 +29,7 @@ class ModuleViewModel : ViewModel() {
 
     private val progressRepository = ServiceLocator.progressRepository
     private val settingsRepository = ServiceLocator.settingsRepository
+    private val playerRepository = ServiceLocator.playerRepository
 
     private val moduleId = MutableStateFlow<String?>(null)
 
@@ -34,13 +37,15 @@ class ModuleViewModel : ViewModel() {
         moduleId,
         progressRepository.progress,
         settingsRepository.settings,
-    ) { id, progress, settings ->
+        playerRepository.player,
+    ) { id, progress, settings, player ->
         val module = id?.let { Modules.byId(it) }
         ModuleUiState(
             module = module,
             answers = module?.let { progress.of(it.id).answers }.orEmpty(),
             currency = settings.currency,
             isDone = module?.let { progress.isDone(it.id) } ?: false,
+            best = module?.let { player.bestFor(it.id) } ?: 0,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ModuleUiState())
 

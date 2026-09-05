@@ -1,5 +1,11 @@
 package com.cashfluent.app.content
 
+import com.cashfluent.app.domain.finance.Money
+import com.cashfluent.app.domain.game.Medal
+import com.cashfluent.app.domain.league.League
+import com.cashfluent.app.domain.league.LeagueCard
+import com.cashfluent.app.domain.league.MergeResult
+
 /**
  * Everything on screen that is not module content. Kept beside the modules rather than
  * in strings.xml so all the app's words live in one place and stay compile-checked.
@@ -61,10 +67,92 @@ object UiStrings {
     const val GUIDED_TITLE = "Guided path"
     const val GUIDED_SUB = "Unlock modules one at a time, in order. Off means everything is open"
     const val RESET_TITLE = "Reset progress"
-    const val RESET_SUB = "Clears which modules you've finished. Nothing else is stored"
+    const val RESET_SUB = "Clears finished modules, points and medals. Your name and your league stay"
     const val RESET_ACTION = "Reset"
     const val RESET_CONFIRM_TITLE = "Reset your progress?"
-    const val RESET_CONFIRM_BODY = "Every module goes back to New. This can't be undone."
+    const val RESET_CONFIRM_BODY = "Every module goes back to New, and your points and medals go to zero. This can't be undone."
+
+    // Games
+    const val GAME = "Game"
+    const val GAME_INTRO = "Five rounds. Each one is this lesson's formula, on numbers you haven't seen " +
+        "yet. Within 5% of the answer is full marks."
+    fun round(index: Int, total: Int) = "Round $index of $total"
+    const val YOUR_ANSWER = "Your answer"
+    const val THE_ANSWER = "The answer"
+    const val LOCK_IN = "Lock in"
+    const val NEXT_ROUND = "Next round"
+    const val SEE_SCORE = "See your score"
+    const val CALCULATION = "The calculation"
+    const val YOUR_SCORE = "Your score"
+    const val SCORE = "Score"
+    const val BEST = "Best"
+    const val MEDAL = "Medal"
+    const val NEW_BEST = "New best"
+    const val NEW_MEDAL = "New medal"
+    const val PLAY_AGAIN = "Play again"
+    const val PLAY_GAME = "Play the game"
+    const val PICK_ONE = "Pick one to lock in"
+    const val BACK_TO_LESSON = "Back to the lesson"
+    const val SEE_LEAGUE = "See the league"
+    fun points(n: Int) = "$n pts"
+    fun pointsSoFar(n: Int) = "$n pts so far"
+    fun outOf(score: Int, max: Int) = "$score of $max"
+    fun best(best: Int, max: Int) = "Best $best of $max"
+    fun medalName(medal: Medal) = when (medal) {
+        Medal.NONE -> "No medal yet"
+        Medal.BRONZE -> "Bronze"
+        Medal.SILVER -> "Silver"
+        Medal.GOLD -> "Gold"
+    }
+    fun medalRule() = "Bronze at ${Medal.BRONZE_AT}, silver at ${Medal.SILVER_AT}, gold at ${Medal.GOLD_AT}."
+    fun roundVerdict(points: Int) = when {
+        points >= 100 -> "Spot on: $points points."
+        points >= 70 -> "Close: $points points."
+        points > 0 -> "Not far: $points points."
+        else -> "Way off: 0 points. The calculation is below."
+    }
+
+    // League
+    const val LEAGUE = "League"
+    const val LEAGUE_ARROW = "League →"
+    const val LEAGUE_TITLE = "Your league"
+    const val THIS_WEEK = "This week"
+    const val ALL_TIME = "All time"
+    const val MEDALS = "Medals"
+    const val YOUR_NAME = "Your name on the card"
+    const val NAME_HINT = "A nickname. It travels with your card, so keep it to what you'd write on a team sheet."
+    const val SHARE_CARD = "Share my card"
+    const val PASTE_CARD = "Paste a friend's card"
+    const val NAME_FIRST = "Pick a name first, so friends know whose card it is."
+    const val LEAGUE_HOW_TITLE = "How a league works here"
+    const val LEAGUE_HOW = "No server and no account. Your card is one line of text: send it to friends on " +
+        "any app you already use, and paste theirs here. The board ranks everyone on this week's points " +
+        "and starts again every Monday. Twenty people at most — small enough that a place in it means " +
+        "something."
+    const val LEAGUE_EMPTY = "Nobody else here yet. Share your card, then paste the ones that come back."
+    const val YOU = "you"
+    const val PLAY = "Play"
+    fun remove(name: String) = "Remove $name"
+    const val NOTHING_FOUND = "No card in what you pasted. A card is one line that starts with CF1."
+    const val CLIPBOARD_EMPTY = "Nothing to paste. Copy a friend's card first."
+    const val LEAGUE_STRIP_EMPTY = "Play a lesson's game to earn points"
+    fun leagueStrip(total: Int, week: Int) = "${Money.number(total.toDouble())} pts · $week this week"
+    fun imported(result: MergeResult): String {
+        val parts = buildList {
+            if (result.added > 0) add("${result.added} added")
+            if (result.updated > 0) add("${result.updated} updated")
+            if (result.unchanged > 0) add("${result.unchanged} already here")
+            if (result.refusedFull > 0) add("${result.refusedFull} left out, the league is full at ${League.SIZE}")
+            if (result.yourself > 0) add("your own card skipped")
+        }
+        if (parts.isEmpty()) return NOTHING_FOUND
+        return parts.joinToString(", ").replaceFirstChar { it.uppercase() } + "."
+    }
+    fun shareText(card: LeagueCard, token: String) =
+        "Cashfluent league card\n" +
+            "${card.name}: ${card.weekPoints} pts this week, ${card.totalPoints} all time, " +
+            "${card.medalCount} medals.\n\n$token\n\n" +
+            "To add me: open Cashfluent, tap League, then Paste a friend's card."
     const val RESET_CONFIRM_OK = "Reset"
     const val RESET_CONFIRM_CANCEL = "Keep it"
     const val GROUP_ABOUT = "About"

@@ -27,6 +27,16 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--
+              League cards arrive as plain text shared from any messaging app. Receiving a
+              share needs no permission: the other app hands the text over, this one reads
+              it as a card or ignores it. Still no INTERNET.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
     </application>
 </manifest>

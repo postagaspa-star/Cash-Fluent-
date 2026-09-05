@@ -6,12 +6,13 @@ import com.cashfluent.app.content.Module
 import com.cashfluent.app.content.Modules
 import com.cashfluent.app.data.UserSettings
 import com.cashfluent.app.data.model.ModuleStatus
+import com.cashfluent.app.data.model.Player
 import com.cashfluent.app.data.model.Progress
 import com.cashfluent.app.di.ServiceLocator
+import com.cashfluent.app.domain.game.Medal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -21,6 +22,7 @@ data class HomeModuleRow(
     val unlocked: Boolean,
     val isStartHere: Boolean,
     val lockedBehind: String?,
+    val medal: Medal,
 )
 
 data class HomeState(
@@ -28,6 +30,8 @@ data class HomeState(
     val doneCount: Int,
     val total: Int,
     val showMethodCard: Boolean,
+    val points: Int,
+    val weekPoints: Int,
 ) {
     val fraction: Float get() = if (total == 0) 0f else doneCount.toFloat() / total
 }
@@ -36,25 +40,22 @@ class HomeViewModel : ViewModel() {
 
     private val progressRepository = ServiceLocator.progressRepository
     private val settingsRepository = ServiceLocator.settingsRepository
+    private val playerRepository = ServiceLocator.playerRepository
 
     val state: StateFlow<HomeState> =
-        combine(progressRepository.progress, settingsRepository.settings, ::buildState)
+        combine(progressRepository.progress, settingsRepository.settings, playerRepository.player, ::buildState)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = buildState(Progress(), UserSettings()),
+                initialValue = buildState(Progress(), UserSettings(), Player()),
             )
-
-    val guidedPath: StateFlow<Boolean> = settingsRepository.settings
-        .map { it.guidedPath }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
     fun dismissMethodCard() {
         viewModelScope.launch { settingsRepository.dismissMethodCard() }
     }
 
     private companion object {
-        fun buildState(progress: Progress, settings: UserSettings): HomeState {
+        fun buildState(progress: Progress, settings: UserSettings, player: Player): HomeState {
             val startHere = progress.firstUnfinished(Modules.coreIds)
             val rows = Modules.all.map { module ->
                 val unlocked = !settings.guidedPath ||
@@ -65,6 +66,7 @@ class HomeViewModel : ViewModel() {
                     unlocked = unlocked,
                     isStartHere = module.id == startHere && unlocked,
                     lockedBehind = if (unlocked) null else previousNumberOf(module),
+                    medal = player.medalFor(module.id),
                 )
             }
             return HomeState(
@@ -72,6 +74,8 @@ class HomeViewModel : ViewModel() {
                 doneCount = progress.doneCountIn(Modules.coreIds),
                 total = Modules.coreIds.size,
                 showMethodCard = !settings.methodCardDismissed,
+                points = player.totalPoints,
+                weekPoints = player.weekPoints,
             )
         }
 

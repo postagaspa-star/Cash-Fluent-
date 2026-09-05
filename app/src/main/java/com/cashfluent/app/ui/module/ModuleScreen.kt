@@ -37,11 +37,15 @@ import com.cashfluent.app.content.Modules
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.content.inCurrency
 import com.cashfluent.app.domain.finance.Currency
+import com.cashfluent.app.domain.game.GameRules
+import com.cashfluent.app.domain.game.Medal
 import com.cashfluent.app.ui.components.BodyText
 import com.cashfluent.app.ui.components.Callout
 import com.cashfluent.app.ui.components.FormulaCard
+import com.cashfluent.app.ui.components.MedalPill
 import com.cashfluent.app.ui.components.NumberedStep
 import com.cashfluent.app.ui.components.Pill
+import com.cashfluent.app.ui.components.PrimaryButton
 import com.cashfluent.app.ui.components.Punchline
 import com.cashfluent.app.ui.components.QuestionCard
 import com.cashfluent.app.ui.components.SectionHeader
@@ -68,6 +72,7 @@ fun ModuleScreen(
     moduleId: String,
     onBack: () -> Unit,
     onOpenModule: (String) -> Unit,
+    onOpenGame: (String) -> Unit,
     viewModel: ModuleViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -121,7 +126,15 @@ fun ModuleScreen(
             // Added only once the check is complete. An empty item still gets the column's
             // 44dp of spacing, which showed up as a blank band at the foot of every lesson.
             if (state.allAnswered) {
-                item { CompletionBlock(module = module, onOpenModule = onOpenModule, onBack = onBack) }
+                item {
+                    CompletionBlock(
+                        module = module,
+                        best = state.best,
+                        onOpenGame = onOpenGame,
+                        onOpenModule = onOpenModule,
+                        onBack = onBack,
+                    )
+                }
             }
         }
     }
@@ -313,6 +326,8 @@ private fun CheckBlock(
 @Composable
 private fun CompletionBlock(
     module: Module,
+    best: Int,
+    onOpenGame: (String) -> Unit,
     onOpenModule: (String) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -355,6 +370,31 @@ private fun CompletionBlock(
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.goldInk,
             )
+        }
+
+        // The game: the same formula, on numbers the lesson never showed.
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            PrimaryButton(text = UiStrings.PLAY_GAME, onClick = { onOpenGame(module.id) })
+            if (best > 0) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = UiStrings.best(best, GameRules.MAX_SCORE),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.muted,
+                    )
+                    val medal = Medal.forScore(best)
+                    if (medal != Medal.NONE) MedalPill(medal)
+                }
+            } else {
+                Text(
+                    text = UiStrings.GAME_INTRO,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.muted,
+                )
+            }
         }
 
         if (next != null) {
