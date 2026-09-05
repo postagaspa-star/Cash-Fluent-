@@ -1,7 +1,6 @@
 package com.cashfluent.app.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -17,14 +16,7 @@ import com.cashfluent.app.ui.module.ModuleScreen
 import com.cashfluent.app.ui.settings.SettingsScreen
 
 @Composable
-fun CashfluentNavHost(
-    navController: NavHostController = rememberNavController(),
-    /** True when the app was opened by another app handing it a league card. */
-    openLeagueOnStart: Boolean = false,
-) {
-    LaunchedEffect(openLeagueOnStart) {
-        if (openLeagueOnStart) navController.open(Destinations.LEAGUE)
-    }
+fun CashfluentNavHost(navController: NavHostController = rememberNavController()) {
 
     NavHost(navController = navController, startDestination = Destinations.HOME) {
 

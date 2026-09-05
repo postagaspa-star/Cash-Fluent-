@@ -2,81 +2,57 @@ package com.cashfluent.app.domain.league
 
 /** One row of the board. */
 data class Standing(
-    val card: LeagueCard,
+    val entrant: Entrant,
     val position: Int,
     val isYou: Boolean,
-    val weekPoints: Int,
     val zone: Zone,
-)
-
-data class MergeResult(
-    val friends: List<LeagueCard>,
-    val added: Int,
-    val updated: Int,
-    val unchanged: Int,
-    val refusedFull: Int,
-    val yourself: Int,
 ) {
-    val changed: Int get() = added + updated
+    val weekPoints: Int get() = entrant.weekPoints
 }
 
 /**
- * A league is the people whose cards you have on your phone, and you. Twenty at most,
- * ranked on this week's points, because a place in a list of twenty is legible and a
- * place in a list of a million is not. The zones follow the rules in [Promotion].
+ * A league is up to twenty people on the same rung in the same week, ranked on this
+ * week's points — because a place in a list of twenty is legible and a place in a list
+ * of a million is not. The zones follow the rules in [Promotion].
+ *
+ * Who sits with whom is decided by the server as people turn up: the first twenty on a
+ * rung fill one league, the next twenty open another. The ids below name those leagues
+ * so that every phone, and the rules on the server, spell them the same way.
  */
 object League {
 
     const val SIZE = Promotion.LEAGUE_SIZE
-    const val MAX_FRIENDS = SIZE - 1
 
-    fun standings(you: LeagueCard, friends: List<LeagueCard>, currentWeek: Int, tier: Tier): List<Standing> {
-        val everyone = friends.filter { it.id != you.id } + you
-        val ordered = everyone.sortedWith(
-            compareByDescending<LeagueCard> { it.pointsThisWeek(currentWeek) }
+    fun standings(entrants: List<Entrant>, yourId: String, tier: Tier): List<Standing> {
+        val ordered = entrants.distinctBy { it.id }.sortedWith(
+            compareByDescending<Entrant> { it.weekPoints }
                 .thenByDescending { it.totalPoints }
-                .thenBy { it.name.lowercase() },
+                .thenBy { it.name.lowercase() }
+                .thenBy { it.id },
         )
-        return ordered.mapIndexed { index, card ->
+        return ordered.mapIndexed { index, entrant ->
             val position = index + 1
-            val points = card.pointsThisWeek(currentWeek)
-            Standing(card, position, card.id == you.id, points, Promotion.zone(position, ordered.size, tier, points))
+            Standing(entrant, position, entrant.id == yourId, Promotion.zone(position, ordered.size, tier, entrant.weekPoints))
         }
     }
-
-    /** Newer wins: a later week, or the same week with at least as many points. */
-    fun isNewer(incoming: LeagueCard, existing: LeagueCard): Boolean =
-        incoming.week > existing.week ||
-            (incoming.week == existing.week && incoming.totalPoints >= existing.totalPoints)
 
     /**
-     * Fold pasted cards into the friends you already have: a known id is refreshed if
-     * the card is newer, a new one is added while there is room, your own is skipped.
+     * What a closed board did to you. Someone whose row is not on it — the seat was
+     * taken, the phone never came back — counts as last with nothing, which is what the
+     * rule about zero points is for.
      */
-    fun merge(existing: List<LeagueCard>, incoming: List<LeagueCard>, yourId: String): MergeResult {
-        val byId = LinkedHashMap(existing.associateBy { it.id })
-        var added = 0
-        var updated = 0
-        var unchanged = 0
-        var refusedFull = 0
-        var yourself = 0
-        for (card in incoming) {
-            val known = byId[card.id]
-            when {
-                card.id == yourId -> yourself++
-                known != null -> if (card != known && isNewer(card, known)) {
-                    byId[card.id] = card
-                    updated++
-                } else {
-                    unchanged++
-                }
-                byId.size >= MAX_FRIENDS -> refusedFull++
-                else -> {
-                    byId[card.id] = card
-                    added++
-                }
-            }
+    fun outcome(board: List<Entrant>, yourId: String, week: Int, tier: Tier): WeekOutcome {
+        val mine = standings(board, yourId, tier).firstOrNull { it.isYou }
+        return if (mine != null) {
+            Promotion.outcome(week, tier, mine.position, board.size, mine.weekPoints)
+        } else {
+            Promotion.outcome(week, tier, board.size + 1, board.size + 1, 0)
         }
-        return MergeResult(byId.values.toList(), added, updated, unchanged, refusedFull, yourself)
     }
+
+    /** `w2957-gold`: the queue every phone on a rung joins in a given week. */
+    fun lobbyId(week: Int, tier: Tier): String = "w$week-${tier.name.lowercase()}"
+
+    /** `w2957-gold-3`: the third league of twenty to open on that rung that week. */
+    fun boardId(week: Int, tier: Tier, ordinal: Int): String = "${lobbyId(week, tier)}-$ordinal"
 }

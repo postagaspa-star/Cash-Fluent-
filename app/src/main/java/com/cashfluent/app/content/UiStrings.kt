@@ -1,9 +1,6 @@
 package com.cashfluent.app.content
 
 import com.cashfluent.app.domain.finance.Money
-import com.cashfluent.app.domain.league.League
-import com.cashfluent.app.domain.league.LeagueCard
-import com.cashfluent.app.domain.league.MergeResult
 import com.cashfluent.app.domain.league.Movement
 import com.cashfluent.app.domain.league.Promotion
 import com.cashfluent.app.domain.league.Tier
@@ -77,7 +74,7 @@ object UiStrings {
     const val GUIDED_TITLE = "Guided path"
     const val GUIDED_SUB = "Unlock modules one at a time, in order. Off means everything is open"
     const val RESET_TITLE = "Reset progress"
-    const val RESET_SUB = "Clears finished modules, points and best scores, and drops you back to the Wood league. Your name and your friends' cards stay"
+    const val RESET_SUB = "Clears finished modules, points and best scores, and drops you back to the Wood league. Your name stays"
     const val RESET_ACTION = "Reset"
     const val RESET_CONFIRM_TITLE = "Reset your progress?"
     const val RESET_CONFIRM_BODY = "Every module goes back to New, your points and best scores go to zero, and you start again in the Wood league. This can't be undone."
@@ -87,8 +84,8 @@ object UiStrings {
     const val ABOUT_TITLE = "Why Cashfluent exists"
     const val ABOUT_SUB = "The problem, the method, and what this app is not"
     const val PRIVACY_NOTE =
-        "No account. No ads. No tracking. Nothing you type here leaves your phone — " +
-            "there is no server to send it to."
+        "No account, no ads, no tracking. Lessons, answers and settings never leave this phone. " +
+            "The league sends one line — your nickname and your points — and nothing else."
     fun version(build: String) = "Cashfluent $build · GatewayHacks 2026"
 
     // Games — the catalogue
@@ -138,18 +135,31 @@ object UiStrings {
     const val WEEK_SHORT = "Week"
     const val ALL_TIME = "All time"
     const val GAMES_PLAYED = "Games"
-    const val YOUR_NAME = "Your name on the card"
-    const val NAME_HINT = "A nickname. It travels with your card, so keep it to what you'd write on a team sheet."
-    const val SHARE_CARD = "Share my card"
-    const val PASTE_CARD = "Paste a friend's card"
-    const val NAME_FIRST = "Pick a name first, so friends know whose card it is."
+    const val YOUR_NAME = "Your name on the board"
+    const val NAME_HINT = "A nickname, seen by the nineteen people you are playing against. Keep it to " +
+        "what you'd write on a team sheet."
+    const val UNNAMED = "Someone"
     const val LEAGUE_RULES = "Top five go up a league on Monday. In a board of ten or more, the bottom five " +
         "go down. Nobody with zero points holds their place."
     const val LEAGUE_HOW_TITLE = "How a league works here"
-    const val LEAGUE_HOW = "Your card is one line of text: send it to friends on any app you already use, " +
-        "and paste theirs here. The board ranks everyone on this week's points and starts again every " +
-        "Monday, and where you finish decides the rung you start the next week on. Twenty people at most."
-    const val LEAGUE_EMPTY = "Nobody else here yet. Share your card, then paste the ones that come back."
+    const val LEAGUE_HOW = "Twenty people at most, all on the same rung, all playing the same week. You are " +
+        "put in one the first time you open this screen — nobody has to be invited, and nobody has to be " +
+        "found. The board ranks everyone on this week's points, starts again every Monday, and where you " +
+        "finish decides the rung you start the next week on."
+    const val LEAGUE_PRIVACY_TITLE = "What the league knows about you"
+    const val LEAGUE_PRIVACY = "A random id, the nickname you typed, and two numbers: this week's points " +
+        "and your points all time. No email, no password, no sign-up. The lessons, your answers and your " +
+        "settings never leave this phone."
+    const val LEAGUE_CONNECTING = "Finding you a league…"
+    const val LEAGUE_OFFLINE = "No connection, so there is no board yet. Your points are safe on this phone " +
+        "and go up the moment there is one. Tap to try again."
+    const val LEAGUE_STALE = "Showing the board as it was when you were last online."
+    const val LEAGUE_ALONE = "First one here this week. The next nineteen people to open Cashfluent join you."
+    fun boardStatus(size: Int, daysLeft: Int): String {
+        val people = if (size == 1) "1 player" else "$size players"
+        val time = if (daysLeft <= 1) "ends tonight" else "$daysLeft days left"
+        return "$people · $time"
+    }
     const val LADDER = "The ladder"
     const val YOU_ARE_HERE = "you are here"
     const val ZONE_UP = "↑"
@@ -158,20 +168,6 @@ object UiStrings {
     const val ZONE_DOWN_DESC = "demotion zone"
     const val OUTCOME_DISMISS = "Got it"
     const val YOU = "you"
-    fun remove(name: String) = "Remove $name"
-    const val NOTHING_FOUND = "No card in what you pasted. A card is one line that starts with CF1."
-    const val CLIPBOARD_EMPTY = "Nothing to paste. Copy a friend's card first."
-    fun imported(result: MergeResult): String {
-        val parts = buildList {
-            if (result.added > 0) add("${result.added} added")
-            if (result.updated > 0) add("${result.updated} updated")
-            if (result.unchanged > 0) add("${result.unchanged} already here")
-            if (result.refusedFull > 0) add("${result.refusedFull} left out, the league is full at ${League.SIZE}")
-            if (result.yourself > 0) add("your own card skipped")
-        }
-        if (parts.isEmpty()) return NOTHING_FOUND
-        return parts.joinToString(", ").replaceFirstChar { it.uppercase() } + "."
-    }
     fun outcomeBanner(outcome: WeekOutcome): String {
         val place = "${Promotion.ordinal(outcome.position)} of ${outcome.size}"
         return when (outcome.movement) {
@@ -187,11 +183,6 @@ object UiStrings {
                 "You hold your place in the ${leagueName(outcome.to)} — $place last week with ${outcome.weekPoints} pts."
         }
     }
-    fun shareText(card: LeagueCard, token: String) =
-        "Cashfluent league card\n" +
-            "${card.name}: ${card.weekPoints} pts this week, ${card.totalPoints} all time, " +
-            "${leagueName(card.tier)}.\n\n$token\n\n" +
-            "To add me: open Cashfluent, tap League, then Paste a friend's card."
 }
 
 /** The About screen, which is also the clearest statement of what the project is for. */
@@ -223,8 +214,9 @@ object AboutContent {
             "stays your call.",
         "It has nothing to sell you. No ads, no affiliate links, no broker to sign up with, " +
             "no premium tier.",
-        "It doesn't want your data. There is no account and no server — everything stays on " +
-            "this phone.",
+        "It doesn't want your data. There is no account, no email and no password: the league " +
+            "gives your phone a random id and knows a nickname and two numbers. Everything else — " +
+            "the lessons, your answers, your settings — stays on this phone.",
         "The tax and contribution rates in these examples are simplified and illustrative. " +
             "Real rates differ by country and change from year to year. Look yours up — now " +
             "that you know the shape, they'll make sense.",

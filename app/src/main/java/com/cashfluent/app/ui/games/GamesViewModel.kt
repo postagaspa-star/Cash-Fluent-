@@ -32,13 +32,13 @@ data class GamesState(
 
 class GamesViewModel : ViewModel() {
 
-    private val playerRepository = ServiceLocator.playerRepository
+    private val league = ServiceLocator.league
 
     init {
-        viewModelScope.launch { playerRepository.settle() }
+        viewModelScope.launch { league.settle() }
     }
 
-    val state: StateFlow<GamesState> = playerRepository.player
+    val state: StateFlow<GamesState> = league.player
         .map(::buildState)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), buildState(Player()))
 

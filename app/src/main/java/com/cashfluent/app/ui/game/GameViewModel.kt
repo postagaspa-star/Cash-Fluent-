@@ -54,7 +54,7 @@ data class GameState(
  */
 class GameViewModel : ViewModel() {
 
-    private val playerRepository = ServiceLocator.playerRepository
+    private val league = ServiceLocator.league
     private val settingsRepository = ServiceLocator.settingsRepository
 
     private val _state = MutableStateFlow(GameState())
@@ -88,7 +88,7 @@ class GameViewModel : ViewModel() {
             guess = startingGuess(game.rounds.first()),
         )
         viewModelScope.launch {
-            val best = playerRepository.player.first().bestFor(gameId)
+            val best = league.player.first().bestFor(gameId)
             _state.update { it.copy(best = best) }
         }
     }
@@ -136,7 +136,7 @@ class GameViewModel : ViewModel() {
     private fun finish(current: GameState) {
         _state.value = current.copy(finished = true)
         viewModelScope.launch {
-            val outcome = playerRepository.recordGame(current.miniGame!!.id, current.total)
+            val outcome = league.recordGame(current.miniGame!!.id, current.total)
             _state.update { it.copy(outcome = outcome, best = outcome.best) }
         }
     }

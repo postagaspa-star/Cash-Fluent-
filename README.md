@@ -52,11 +52,16 @@ eight rungs — Wood, Bronze, Silver, Gold, Ruby, Emerald, Diamond, Elite. On Mo
 five go up a rung; in a board of ten or more the bottom five go down; nobody with zero
 points holds their place.
 
-Today the board is built from *cards*: one line of text carrying a random id, a nickname,
-points and rung, sent to friends through any app you already use and pasted back in. That
-keeps the app entirely offline. An online league — weekly groups of twenty assigned
-automatically, no sharing by hand — is the next step, and the trade-off is written down in
-**[BACKLOG.md](BACKLOG.md)**.
+The board is real and it is shared. The first time you open the league screen the app
+signs your phone in anonymously — no email, no password, no sign-up screen — and seats you
+with up to nineteen other people on your rung, that week. Nobody has to be invited and
+nobody has to be found. What the server holds about you is a random id, the nickname you
+typed, and two numbers.
+
+Everything else keeps working with the network switched off: the lessons, the games, the
+simulators and your points are on the phone. A game scored on a train is counted straight
+away and reaches the board when there is a signal. If the league cannot be reached the
+screen says so in one line, and nothing is lost.
 
 ## Status
 
@@ -72,8 +77,9 @@ seven screens.
 - [x] Ten interactive simulators with hand-drawn charts
 - [x] Bundled Archivo and IBM Plex Mono, static weights, no runtime download
 - [x] Sixty mini-games in their own section, scored against the calculators — 12 tests
-- [x] Points, the weekly board, and the eight-rung ladder with its rules — 19 tests
-- [ ] Online league with weekly groups assigned automatically — decision pending, see BACKLOG
+- [x] Points, the weekly board, and the eight-rung ladder with its rules — 25 tests
+- [x] Online league on Firebase: anonymous sign-in, leagues of twenty assigned
+      automatically, live board — with the security rules tested against the emulator
 - [ ] Accessibility pass on a real device with TalkBack (layout at 200% text checked)
 - [ ] App icon — currently a marked placeholder
 
@@ -108,10 +114,18 @@ Requires Android Studio (Ladybug or newer) and JDK 17.
 ```
 
 Without the Android SDK you can still run the pure-Kotlin half — the ten calculators,
-the sixty games, the league and the whole curriculum, 127 tests — on a plain JVM:
+the sixty games, the whole league including its weekly settlement, and the curriculum —
+on a plain JVM:
 
 ```bash
 cd tools/verify && gradle test
+```
+
+The security rules are tested too, against the Firestore emulator rather than the real
+project:
+
+```bash
+cd tools/rules && npm install && npm test
 ```
 
 ## What's inside
@@ -119,26 +133,39 @@ cd tools/verify && gradle test
 ```
 app/src/main/java/com/cashfluent/app/
 ├── content/         the ten lessons, as typed Kotlin rather than JSON
-├── data/            DataStore repositories — progress, settings, points and league
-├── di/              a thirteen-line service locator, no DI framework
+├── data/            DataStore repositories — progress, settings and the player
+├── data/league/     the week, end to end: sign in, seat, score, settle. No Android
+├── data/firebase/   the one implementation that talks to a server
+├── di/              a service locator, no DI framework
 ├── domain/finance/  the calculators: pure Kotlin, no Android imports
 ├── domain/game/     the sixty mini-games, each built on one calculator
-├── domain/league/   cards, the board, the ladder and the rules of the week
+├── domain/league/   the board, the ladder, and the rules of the week
 └── ui/              theme, navigation, screens, simulators, games, league
+firestore.rules      what a phone may read and write, and nothing more
 tools/               development only, ships nothing — see tools/README.md
 ```
 
 The calculators carry no Android dependency on purpose, so the numbers on screen — in
 the lessons and in the games — are covered by unit tests that run in about a second.
 
-## Deliberately absent
+## What leaves the phone, and what doesn't
 
-No account. No ads. No tracking. **No `INTERNET` permission** — there is no server to send
-anything to, and the manifest is the proof. Everything works offline, which is the point:
-equity means the person with a cheap phone and unreliable wifi opens the same app. The
-league is the one feature that would gain from a server; if it goes online it will carry a
-nickname and points and nothing else, and this paragraph, the note in Settings and the
-About screen change with it.
+No account. No ads. No tracking. No analytics. **One permission, `INTERNET`, and one
+feature uses it**: the league sends a random id, a nickname and two numbers, and reads
+back the nineteen other rows on your board. That is the whole of it, and
+[`firestore.rules`](firestore.rules) is where a reader can check rather than take our
+word for it — a phone can write one document, its own, on a board whose week has not
+ended, with every field bounded.
+
+Everything else is local and stays local: the lessons, every answer you type into a
+simulator, your progress and your settings. The app opens, teaches and scores with the
+network off, because equity means the person with a cheap phone and unreliable wifi opens
+the same app. Only the board needs a signal, and it says so when there isn't one.
+
+Points are declared by the phone. The rules bound what can be claimed — a week's total
+cannot exceed what a week of playing could produce — but a determined person could still
+inflate a score. For a league of classmates that is the right trade; it is written here
+rather than dressed up.
 
 Material You dynamic colour is also off. Green means *what you keep* and clay means *what
 it costs you* throughout the app; letting the system swap those hues would delete the

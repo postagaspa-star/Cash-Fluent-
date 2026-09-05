@@ -14,7 +14,7 @@ class SettingsViewModel : ViewModel() {
 
     private val settingsRepository = ServiceLocator.settingsRepository
     private val progressRepository = ServiceLocator.progressRepository
-    private val playerRepository = ServiceLocator.playerRepository
+    private val league = ServiceLocator.league
 
     val settings: StateFlow<UserSettings> = settingsRepository.settings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UserSettings())
@@ -28,11 +28,11 @@ class SettingsViewModel : ViewModel() {
         viewModelScope.launch { settingsRepository.setGuidedPath(enabled) }
     }
 
-    /** Lessons, points and medals go back to zero. The name, the id and the league stay. */
+    /** Lessons, points and the rung go back to zero. The nickname and the id stay. */
     fun resetProgress() {
         viewModelScope.launch {
             progressRepository.reset()
-            playerRepository.resetScores()
+            league.reset()
         }
     }
 }

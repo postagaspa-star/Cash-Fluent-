@@ -17,15 +17,13 @@ enum class Tier(val label: String) {
     val next: Tier? get() = entries.getOrNull(ordinal + 1)
     val previous: Tier? get() = entries.getOrNull(ordinal - 1)
 
-    /** Stored and shared as one digit; anything unexpected reads as the first rung. */
-    val digit: Char get() = '0' + ordinal
-
     companion object {
         val FIRST = WOOD
 
-        fun fromDigit(digit: Char): Tier = entries.getOrNull(digit - '0') ?: FIRST
-
+        /** Anything unexpected reads as the first rung, rather than throwing at a screen. */
         fun fromName(name: String?): Tier = entries.firstOrNull { it.name == name } ?: FIRST
+
+        fun fromOrdinal(index: Int?): Tier = entries.getOrNull(index ?: -1) ?: FIRST
     }
 }
 

@@ -15,31 +15,21 @@ Judged on **Social Impact 40% · Technical Execution 30% · Innovation 20% · De
 
 ## 1. Open — waiting on the product owner
 
-### The league goes online
+### One click in the Firebase console
 
-Built on 5 September: a league made of *cards* — one line of text per person, sent
-through any chat app and pasted back in — so the app could stay offline. The product
-owner's answer, the same day: being offline is not an argument for social impact, it is a
-block that stops the leaderboard being built properly, and the leaderboard is the
-gamification. The developer agrees; the "no INTERNET" line was inherited from this file's
-first version and repeated without being questioned. The lessons stay offline either way.
+The league is built and the project is live, but Firebase Authentication has never been
+switched on for `cashfluent-league`, and it cannot be switched on from a script: the REST
+call that provisions it (`identityPlatform:initializeAuth`) answers
+`BILLING_NOT_ENABLED`, because that endpoint belongs to the paid product. The free path
+is a button in the console, and only the account owner can press it.
 
-What an online league buys: weekly groups of twenty assigned automatically, promotion and
-relegation that mean something, live updates, no sharing by hand. What it costs, and how
-each cost is handled:
+1. <https://console.firebase.google.com/project/cashfluent-league/authentication/providers>
+2. **Get started** → **Anonymous** → enable → **Save**.
 
-| Cost | Answer |
-|---|---|
-| Accounts and minors' data | Firebase **anonymous sign-in**: no email, no password, no sign-up screen. Stored: a random id, the nickname, points, rung. A one-paragraph privacy note. |
-| Money | Firebase **Spark plan, €0, no card**. Free limits: 50,000 reads and 20,000 writes a day, 1 GB. Ample for hundreds of players. |
-| A dependency during judging | Firestore on the free plan does not pause and does not need keeping alive. The lessons and games never depend on it. |
-| Cheating | Points are declared by the phone; rules can only bound them. Acceptable for a hackathon, and said plainly. |
-
-The Firebase CLI on the laptop is already logged in to the product owner's Google
-account, so the project can be created and configured from there. **Waiting on one
-thing: the OK to create a Firebase project on that account.** Then: `INTERNET`
-permission, anonymous auth, Firestore with rules, leagues formed by tier and week in
-groups of twenty, the board as a live query, and the cards retired.
+Until then the app behaves exactly as it does with no signal: lessons, games, points and
+the ladder all work, and the league screen says there is no board yet. Nothing is lost,
+and nothing has to be rebuilt afterwards — the next time the screen opens it signs in and
+takes a seat.
 
 ### How the lessons are written
 
@@ -62,25 +52,44 @@ reachable from Home, from the end of every lesson and from the league. A mini-ga
 minute long: four rounds, 100 points a round. Four mechanics — set a number with a
 slider, pick one of a few options, higher or lower, true or false. Every answer is
 computed by the calculator in `domain/finance/`, so a game can never disagree with the
-lesson on the same topic, and every round ends with the calculation written out. This
-replaced the first version's one five-round game per lesson, at the product owner's
-request: games are not a tail on a lesson, they are a section, and there are dozens.
+lesson on the same topic, and every round ends with the calculation written out.
 
 **Points.** Per game, for the week and for all time. A best score per mini-game.
 
 **The ladder.** Eight rungs — Wood, Bronze, Silver, Gold, Ruby, Emerald, Diamond, Elite —
 and the weekly rules in `Promotion`: top five go up, in a board of ten or more the
-bottom five go down, nobody with zero points holds their place, nobody leaves Wood
-downwards or Elite upwards. Monday's verdict is shown once at the top of the board.
-This replaced per-lesson medals, at the product owner's request.
+bottom five go down, nobody with zero points holds their place. Monday's verdict is
+shown once at the top of the board.
 
-**The card league (interim).** Twenty people at most, ranked on this week's points, built
-from cards pasted in. It carries the ladder and the zones already, so the online version
-changes where the board comes from, not what it shows.
+**The league went online.** The first version built a league out of *cards* — one line of
+text per person, sent through any chat app and pasted back in — so that the app could
+keep its "no `INTERNET` permission" line. The product owner's answer, the same day: being
+offline is not an argument for social impact, it is a block that stops the leaderboard
+being built properly, and the leaderboard is the gamification. The developer agrees; the
+line was inherited from this file's first version and repeated without being questioned.
+
+What replaced it, on Firebase:
+
+| | |
+|---|---|
+| Accounts | **Anonymous sign-in.** No email, no password, no sign-up screen. |
+| Held on the server | A random id, the nickname, this week's points, points all time. |
+| Money | **Spark plan, €0, no card.** 50,000 reads and 20,000 writes a day, 1 GB. |
+| A dependency during judging | Firestore on the free plan does not pause. The lessons and the games never touch it. |
+| Cheating | Points are declared by the phone. The rules bound them; the README says so plainly. |
+
+Shaped so the network is never in the way: `LeagueService` owns the week, `LeagueBackend`
+is the only thing that talks to a server, and every step that needs it can fail without
+losing anything — sign in, read last week's verdict off its board, take this week's seat.
+A failure stops at that step and is picked up the next time a screen opens. The rules in
+`firestore.rules` are covered by ten emulator tests, including the one that would fail
+silently: that the server counts weeks exactly as `Week.index` does on the phone.
 
 ## 3. Still to do before submission
 
-- [ ] **Online league** — see §1; blocked on the OK to create the Firebase project.
+- [ ] **Enable anonymous sign-in** — see §1. One click, product owner's account.
+- [ ] **Two phones on one board**, seen with both in hand. The rules and the seating are
+      tested; the round trip through the real project is not, because of §1.
 - [ ] **Accessibility pass with TalkBack**, by ear. Layout at 200% text was checked on a
       real phone on 5 September and holds; roles and selected states are in place.
 - [ ] **App icon.** The current one is a marked placeholder. *Product owner's job, not
@@ -113,7 +122,9 @@ real formulas and real cases — not a simplified one.
 **Everything unlocked by default**, with an opt-in linear path in Settings. This is the
 inverse of a "judging mode": the app does not hide anything and says why.
 
-**Lessons, progress and settings are local and stay local**, whatever the league does.
+**Lessons, progress, settings and every number typed into a simulator are local and stay
+local.** The league is the one thing that leaves, and it carries a random id, a nickname
+and two numbers.
 
 **Games are a section, not a tail.** Dozens of mini-games on the lessons' topics, each a
 minute long, each scored against the calculator behind the topic. No answer key is ever
@@ -121,6 +132,10 @@ typed by hand.
 
 **The ladder is Duolingo's shape.** Wood to Elite in eight rungs, weekly, top five up,
 bottom five down. Points are 100 a round.
+
+**The league is online, and offline is not a feature.** Leagues of twenty are assigned by
+the server, not shared by hand. Everything else works with no signal, and the league says
+so when there is none.
 
 **Currency is a symbol, never a conversion.** Content is written with `{c}` where a
 symbol belongs; `Module.inCurrency()` replaces it once, at the screen boundary. Example
@@ -160,13 +175,24 @@ because a Java properties file eats single backslashes and Gradle then fails wit
 "Invalid file path". `gradlew.bat testDebugUnitTest assembleDebug` takes about three
 minutes. The exit code after a pipe is not the build's: look for `BUILD SUCCESSFUL`.
 
-**The test phone locks itself.** Motorola Edge 50 Fusion, Android 16. adb works once USB
-debugging is authorised, but the pattern lock comes back whenever the screen goes off,
-and only the owner can clear it. Ask, then move fast.
+**That JDK is also what the Firestore emulator needs**, and it is not on the path. In Git
+Bash, `export PATH="/c/Program Files/Android/Android Studio/jbr/bin:$PATH"` — the
+Windows-style `C:/...` form breaks `PATH`, because the colon is the separator.
+
+**Firebase is wired up without `google-services.json`.** Three identifiers in
+`app/build.gradle.kts` become `BuildConfig` fields and `ServiceLocator` builds
+`FirebaseOptions` from them. They are not secrets — every Firebase app ships them — and
+`firestore.rules` is what actually decides who may do what. It also means there is no
+generated file to go stale and nothing extra for a judge to install.
+
+**The test phone locks itself and drops off USB.** Motorola Edge 50 Fusion, Android 16.
+adb works once USB debugging is authorised, but the pattern lock comes back whenever the
+screen goes off and only the owner can clear it. Ask, then move fast.
 
 **`tools/verify/` runs the pure-Kotlin half locally** — the calculators, the games, the
-league and the whole curriculum, no Android SDK needed. Use it before every push; CI is
-for the Compose half. See `tools/README.md`.
+league including its weekly settlement, and the whole curriculum, no Android SDK needed.
+`tools/rules/` runs the security rules against the emulator. Use both before every push;
+CI is for the Compose half. See `tools/README.md`.
 
 **Do not change the git remote in the container.** The repository was renamed to
 `Cash-Fluent-`, but the container's remote must stay
@@ -186,9 +212,10 @@ certificates — so a newer APK refused to install over an older one until the a
 uninstalled, which also wiped the progress. The key signs debug builds only; never reuse
 it for a release.
 
-**A shared-in card is untrusted text.** It arrives through `ACTION_SEND`, is cut at
-20,000 characters before it is read, and every field is bounded before it is believed —
-see `LeagueCards.decode`. Nothing else enters the app from outside.
+**A row read off a board is somebody else's text.** The rules bound it on the way in and
+`FirestoreLeagueBackend` bounds it again on the way out — the name is cut to twenty
+characters and the numbers are clamped — because a rule that is later loosened must not
+be able to reach the screen.
 
 **Semantic colour, and it means something.** Green is what you keep, clay is what it
 costs you, brass is where to look next. Material You dynamic colour is deliberately off:

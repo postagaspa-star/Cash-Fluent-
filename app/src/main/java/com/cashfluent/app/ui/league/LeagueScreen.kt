@@ -1,11 +1,9 @@
 package com.cashfluent.app.ui.league
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,12 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -47,15 +41,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cashfluent.app.content.Tone
 import com.cashfluent.app.content.UiStrings
-import com.cashfluent.app.domain.league.LeagueCards
 import com.cashfluent.app.domain.league.Movement
+import com.cashfluent.app.domain.league.Nickname
 import com.cashfluent.app.domain.league.Standing
 import com.cashfluent.app.domain.league.Tier
 import com.cashfluent.app.domain.league.Zone
 import com.cashfluent.app.ui.components.Callout
 import com.cashfluent.app.ui.components.Pill
 import com.cashfluent.app.ui.components.PlainEnglishResult
-import com.cashfluent.app.ui.components.PrimaryButton
 import com.cashfluent.app.ui.components.ResultTile
 import com.cashfluent.app.ui.components.SectionHeader
 import com.cashfluent.app.ui.components.TextAction
@@ -64,12 +57,12 @@ import com.cashfluent.app.ui.components.TopBar
 import com.cashfluent.app.ui.components.tierColors
 import com.cashfluent.app.ui.theme.CashfluentTheme
 import com.cashfluent.app.ui.theme.CashfluentType
-import kotlinx.coroutines.launch
 
 /**
- * The board for this week, the rung you are on, and the two things you can do with a
- * card: send yours, paste theirs. Zones follow the rules in Promotion — top five up,
- * bottom five down — and last Monday's verdict is said once at the top.
+ * The board for this week, live, and the rung you are on. Zones follow the rules in
+ * Promotion — top five up, bottom five down — and last Monday's verdict is said once at
+ * the top. When the league cannot be reached the screen says so, in one line, and the
+ * points stay on the phone until it can.
  */
 @Composable
 fun LeagueScreen(
@@ -79,9 +72,6 @@ fun LeagueScreen(
 ) {
     val colors = CashfluentTheme.colors
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
-    val scope = rememberCoroutineScope()
     val (tierForeground, tierBackground) = tierColors(state.player.tier)
 
     Column(
@@ -129,6 +119,14 @@ fun LeagueScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = tierForeground,
                     )
+                    if (state.player.seated) {
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            text = UiStrings.boardStatus(state.standings.size, state.daysLeft),
+                            style = CashfluentType.dataSmall,
+                            color = tierForeground,
+                        )
+                    }
                 }
             }
 
@@ -160,41 +158,26 @@ fun LeagueScreen(
                 }
             }
 
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    PrimaryButton(
-                        text = UiStrings.SHARE_CARD,
-                        enabled = state.player.hasName,
-                        onClick = {
-                            scope.launch {
-                                val text = viewModel.shareText()
-                                val send = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, text)
-                                }
-                                context.startActivity(Intent.createChooser(send, UiStrings.SHARE_CARD))
-                            }
-                        },
-                    )
-                    if (!state.player.hasName) {
-                        Text(
-                            text = UiStrings.NAME_FIRST,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = colors.muted,
-                        )
-                    }
-                    TextAction(
-                        text = UiStrings.PASTE_CARD,
-                        onClick = { viewModel.importText(clipboard.getText()?.text) },
+            when {
+                !state.player.seated && state.offline -> item {
+                    PlainEnglishResult(
+                        text = UiStrings.LEAGUE_OFFLINE,
+                        tone = Tone.COST,
+                        modifier = Modifier.clickable(role = Role.Button, onClick = viewModel::retry),
                     )
                 }
-            }
-
-            state.message?.let { message ->
-                item {
-                    PlainEnglishResult(
-                        text = message,
-                        modifier = Modifier.clickable(role = Role.Button, onClick = viewModel::dismissMessage),
+                !state.player.seated -> item {
+                    Text(
+                        text = UiStrings.LEAGUE_CONNECTING,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.muted,
+                    )
+                }
+                state.offline -> item {
+                    Text(
+                        text = UiStrings.LEAGUE_STALE,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.muted,
                     )
                 }
             }
@@ -212,18 +195,15 @@ fun LeagueScreen(
                 )
             }
 
-            items(state.standings, key = { it.card.id }) { standing ->
-                StandingRow(
-                    standing = standing,
-                    onRemove = { viewModel.removeFriend(standing.card.id) },
-                )
+            items(state.standings, key = { it.entrant.id }) { standing ->
+                StandingRow(standing)
                 HorizontalDivider(color = colors.line)
             }
 
-            if (state.alone) {
+            if (state.player.seated && state.alone) {
                 item {
                     Text(
-                        text = UiStrings.LEAGUE_EMPTY,
+                        text = UiStrings.LEAGUE_ALONE,
                         style = MaterialTheme.typography.bodyMedium,
                         color = colors.muted,
                     )
@@ -234,6 +214,15 @@ fun LeagueScreen(
                 Callout(
                     label = UiStrings.LEAGUE_HOW_TITLE,
                     body = UiStrings.LEAGUE_HOW,
+                    background = colors.surfaceAlt,
+                    foreground = colors.inkSecondary,
+                )
+            }
+
+            item {
+                Callout(
+                    label = UiStrings.LEAGUE_PRIVACY_TITLE,
+                    body = UiStrings.LEAGUE_PRIVACY,
                     background = colors.surfaceAlt,
                     foreground = colors.inkSecondary,
                 )
@@ -266,7 +255,7 @@ private fun NameField(stored: String, onChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = { raw ->
-            val next = raw.take(LeagueCards.MAX_NAME)
+            val next = raw.take(Nickname.MAX)
             typed = next
             onChange(next)
         },
@@ -291,9 +280,9 @@ private fun NameField(stored: String, onChange: (String) -> Unit) {
 }
 
 @Composable
-private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
+private fun StandingRow(standing: Standing) {
     val colors = CashfluentTheme.colors
-    val card = standing.card
+    val entrant = standing.entrant
     val zoneColor = when (standing.zone) {
         Zone.PROMOTION -> colors.grow
         Zone.DEMOTION -> colors.cost
@@ -334,7 +323,7 @@ private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = card.name,
+                    text = entrant.name.ifBlank { UiStrings.UNNAMED },
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (standing.isYou) colors.growInk else colors.ink,
                 )
@@ -344,7 +333,7 @@ private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
                 }
             }
             Text(
-                text = "${UiStrings.points(card.totalPoints)} ${UiStrings.ALL_TIME.lowercase()}",
+                text = "${UiStrings.points(entrant.totalPoints)} ${UiStrings.ALL_TIME.lowercase()}",
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.muted,
             )
@@ -354,22 +343,6 @@ private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
             style = CashfluentType.valueSmall,
             color = if (standing.isYou) colors.growInk else colors.ink,
         )
-        if (!standing.isYou) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable(role = Role.Button, onClick = onRemove)
-                    .semantics { contentDescription = UiStrings.remove(card.name) },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = "×",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colors.muted,
-                    modifier = Modifier.clearAndSetSemantics {},
-                )
-            }
-        }
     }
 }
 
