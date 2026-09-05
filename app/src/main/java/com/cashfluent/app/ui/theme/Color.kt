@@ -13,6 +13,9 @@ import androidx.compose.ui.graphics.Color
  * After two screens the reader is meant to read the colour before the number, which is
  * also why Material You dynamic colour stays off: if the system swapped these hues for
  * the ones on someone's wallpaper, the meaning would go with them.
+ *
+ * Two more hues exist for one job only — the rungs of the league ladder that the palette
+ * above cannot name: ruby and diamond. They appear on tier badges and nowhere else.
  */
 
 // Light
@@ -34,6 +37,10 @@ val CostInkLight = Color(0xFF8A3A20)
 val GoldLight = Color(0xFFB5851F)
 val GoldSoftLight = Color(0xFFF6EBD1)
 val GoldInkLight = Color(0xFF7A5A12)
+val RubyLight = Color(0xFF9E2438)
+val RubySoftLight = Color(0xFFF7DEE2)
+val DiamondLight = Color(0xFF2A6F96)
+val DiamondSoftLight = Color(0xFFDCEEF7)
 
 // Dark — given the same care as light, not a naive inversion.
 val PaperDark = Color(0xFF0C1210)
@@ -54,6 +61,10 @@ val CostInkDark = Color(0xFFEDA285)
 val GoldDark = Color(0xFFD9AE55)
 val GoldSoftDark = Color(0xFF312712)
 val GoldInkDark = Color(0xFFE6C378)
+val RubyDark = Color(0xFFE87F8F)
+val RubySoftDark = Color(0xFF3A1C22)
+val DiamondDark = Color(0xFF7CC4E8)
+val DiamondSoftDark = Color(0xFF16303C)
 
 /**
  * The semantic palette. Material 3 has no slot for "this is what it costs you", so the
@@ -79,6 +90,10 @@ data class CashfluentColors(
     val gold: Color,
     val goldSoft: Color,
     val goldInk: Color,
+    val ruby: Color,
+    val rubySoft: Color,
+    val diamond: Color,
+    val diamondSoft: Color,
     val isDark: Boolean,
 )
 
@@ -101,6 +116,10 @@ val LightCashfluentColors = CashfluentColors(
     gold = GoldLight,
     goldSoft = GoldSoftLight,
     goldInk = GoldInkLight,
+    ruby = RubyLight,
+    rubySoft = RubySoftLight,
+    diamond = DiamondLight,
+    diamondSoft = DiamondSoftLight,
     isDark = false,
 )
 
@@ -123,5 +142,9 @@ val DarkCashfluentColors = CashfluentColors(
     gold = GoldDark,
     goldSoft = GoldSoftDark,
     goldInk = GoldInkDark,
+    ruby = RubyDark,
+    rubySoft = RubySoftDark,
+    diamond = DiamondDark,
+    diamondSoft = DiamondSoftDark,
     isDark = true,
 )

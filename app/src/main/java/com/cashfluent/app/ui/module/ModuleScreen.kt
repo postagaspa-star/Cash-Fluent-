@@ -42,6 +42,7 @@ import com.cashfluent.app.ui.components.Callout
 import com.cashfluent.app.ui.components.FormulaCard
 import com.cashfluent.app.ui.components.NumberedStep
 import com.cashfluent.app.ui.components.Pill
+import com.cashfluent.app.ui.components.PrimaryButton
 import com.cashfluent.app.ui.components.Punchline
 import com.cashfluent.app.ui.components.QuestionCard
 import com.cashfluent.app.ui.components.SectionHeader
@@ -68,6 +69,7 @@ fun ModuleScreen(
     moduleId: String,
     onBack: () -> Unit,
     onOpenModule: (String) -> Unit,
+    onOpenGames: (String) -> Unit,
     viewModel: ModuleViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -121,7 +123,14 @@ fun ModuleScreen(
             // Added only once the check is complete. An empty item still gets the column's
             // 44dp of spacing, which showed up as a blank band at the foot of every lesson.
             if (state.allAnswered) {
-                item { CompletionBlock(module = module, onOpenModule = onOpenModule, onBack = onBack) }
+                item {
+                    CompletionBlock(
+                        module = module,
+                        onOpenGames = onOpenGames,
+                        onOpenModule = onOpenModule,
+                        onBack = onBack,
+                    )
+                }
             }
         }
     }
@@ -313,6 +322,7 @@ private fun CheckBlock(
 @Composable
 private fun CompletionBlock(
     module: Module,
+    onOpenGames: (String) -> Unit,
     onOpenModule: (String) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -354,6 +364,16 @@ private fun CompletionBlock(
                 text = module.action,
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.goldInk,
+            )
+        }
+
+        // The games on this topic: the same formula, on numbers the lesson never showed.
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            PrimaryButton(text = UiStrings.GAMES_ON_TOPIC, onClick = { onOpenGames(module.id) })
+            Text(
+                text = UiStrings.GAMES_ON_TOPIC_SUB,
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.muted,
             )
         }
 

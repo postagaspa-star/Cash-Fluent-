@@ -14,8 +14,12 @@ val repo = rootDir.parentFile.parentFile
 
 kotlin {
     sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/domain/finance"))
+    sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/domain/game"))
+    sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/domain/league"))
     sourceSets["main"].kotlin.srcDir(File(repo, "app/src/main/java/com/cashfluent/app/content"))
     sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/domain/finance"))
+    sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/domain/game"))
+    sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/domain/league"))
     sourceSets["test"].kotlin.srcDir(File(repo, "app/src/test/java/com/cashfluent/app/content"))
 }
 

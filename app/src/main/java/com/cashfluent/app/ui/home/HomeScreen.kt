@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.data.model.ModuleStatus
+import com.cashfluent.app.domain.league.Tier
 import com.cashfluent.app.ui.components.Pill
 import com.cashfluent.app.ui.components.ProgressBar
 import com.cashfluent.app.ui.components.SectionLabel
@@ -52,6 +53,8 @@ fun HomeScreen(
     onOpenModule: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenAbout: () -> Unit,
+    onOpenLeague: () -> Unit,
+    onOpenGames: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -68,8 +71,14 @@ fun HomeScreen(
             done = state.doneCount,
             total = state.total,
             fraction = state.fraction,
+            points = state.points,
+            weekPoints = state.weekPoints,
+            tier = state.tier,
+            gamesCount = state.gamesCount,
             onOpenAbout = onOpenAbout,
             onOpenSettings = onOpenSettings,
+            onOpenLeague = onOpenLeague,
+            onOpenGames = onOpenGames,
         )
 
         LazyColumn(
@@ -132,8 +141,14 @@ private fun Header(
     done: Int,
     total: Int,
     fraction: Float,
+    points: Int,
+    weekPoints: Int,
+    tier: Tier,
+    gamesCount: Int,
     onOpenAbout: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenLeague: () -> Unit,
+    onOpenGames: () -> Unit,
 ) {
     val colors = CashfluentTheme.colors
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -160,7 +175,40 @@ private fun Header(
             )
             ProgressBar(fraction, modifier = Modifier.weight(1f))
         }
+        // Two quiet lines: the games, and the league they feed.
+        Strip(
+            text = UiStrings.gamesStrip(gamesCount),
+            action = UiStrings.PLAY_ARROW,
+            onClick = onOpenGames,
+        )
+        Strip(
+            text = if (points == 0) UiStrings.LEAGUE_STRIP_EMPTY else UiStrings.leagueStrip(tier, weekPoints),
+            action = UiStrings.LEAGUE_ARROW,
+            onClick = onOpenLeague,
+        )
+        Spacer(Modifier.height(6.dp))
         HorizontalDivider(color = colors.line)
+    }
+}
+
+/** One line, one destination: a label on the left, the way there on the right. */
+@Composable
+private fun Strip(text: String, action: String, onClick: () -> Unit) {
+    val colors = CashfluentTheme.colors
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = text,
+            style = CashfluentType.dataSmall,
+            color = colors.muted,
+            modifier = Modifier.weight(1f),
+        )
+        Text(text = action, style = MaterialTheme.typography.bodyMedium, color = colors.grow)
     }
 }
 

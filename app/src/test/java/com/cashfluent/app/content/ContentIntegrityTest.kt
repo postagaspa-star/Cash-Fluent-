@@ -2,6 +2,7 @@ package com.cashfluent.app.content
 
 import com.cashfluent.app.domain.finance.Currency
 import com.cashfluent.app.domain.finance.Money
+import com.cashfluent.app.domain.game.MiniGames
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -186,5 +187,11 @@ class ContentIntegrityTest {
         val kinds = modules.map { it.simulator }
         assertEquals(kinds.size, kinds.toSet().size)
         assertEquals(SimulatorKind.entries.size, kinds.size)
+    }
+
+    @Test
+    fun `every lesson has games on its topic, and every game has a lesson`() {
+        modules.forEach { assertTrue(it.id, MiniGames.forTopic(it.id).isNotEmpty()) }
+        assertEquals(modules.map { it.id }.toSet(), MiniGames.all.map { it.topicId }.toSet())
     }
 }

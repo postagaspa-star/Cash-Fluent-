@@ -27,10 +27,23 @@ object Money {
      * A negative amount reads "-$120", sign first, never "$-120". Anything that rounds
      * to zero drops the sign, so "-0" cannot appear either.
      */
-    fun amount(value: Double, currency: Currency, decimals: Int = 0): String {
+    fun amount(value: Double, currency: Currency, decimals: Int = 0): String =
+        signed(value, decimals) { digits -> currency.symbol + digits }
+
+    /** "1,200" — a grouped number with no symbol at all, for arithmetic shown in text. */
+    fun number(value: Double, decimals: Int = 0): String = signed(value, decimals) { it }
+
+    /**
+     * "{c}1,200" — the same as [amount], but carrying the placeholder instead of a
+     * symbol, for text written before anyone knows which currency the reader picked.
+     */
+    fun template(value: Double, decimals: Int = 0): String =
+        signed(value, decimals) { digits -> CURRENCY_PLACEHOLDER + digits }
+
+    private inline fun signed(value: Double, decimals: Int, wrap: (String) -> String): String {
         val digits = String.format(Locale.US, "%,.${decimals}f", abs(value))
         val negative = value < 0.0 && digits.any { it in '1'..'9' }
-        return (if (negative) "-" else "") + currency.symbol + digits
+        return (if (negative) "-" else "") + wrap(digits)
     }
 
     /** "1,631.67" — for anything monthly, where the cents carry meaning. */
