@@ -36,43 +36,45 @@ Ten modules, in reading order: budgeting, compound interest, good debt and bad d
 saving vs investing, shares and funds, gross vs net pay, buy now pay later, your credit
 record, tax nobody deducts for you, and rent vs buy.
 
-## The game, the points, the league
+## The games, the points, the league
 
-Every lesson ends in a game: five rounds of that lesson's formula, on numbers the lesson
-never showed. Set a number with a slider, or pick one of a few options; within 5% of the
-answer is full marks. Every round ends with the calculation written out — the reveal is
-the teaching, the score is what keeps you playing. The answers are computed by the same
-calculators the worked examples are pinned to, so a game can never disagree with the
-lesson that taught it.
+Games are their own section: **sixty mini-games** on the same ten topics as the lessons,
+six per topic, each a minute long — four rounds, up to 100 points a round. Four
+mechanics: set a number with a slider, pick one of a few options, higher or lower, true
+or false. Every answer is computed by the calculator behind the lesson on that topic, so a
+game can never disagree with the lesson, and every round ends with the calculation written
+out — the reveal is the teaching, the score is what keeps you playing. *Surprise me* deals
+any game at random.
 
-Points add up per game (100 a round, 500 a game), and the best score on each lesson
-earns a medal: bronze at 200, silver at 350, gold at 450.
+Points add up per game, for the week and for all time. The **league** is weekly and shaped
+like Duolingo's: a board of up to twenty ranked on this week's points, and a ladder of
+eight rungs — Wood, Bronze, Silver, Gold, Ruby, Emerald, Diamond, Elite. On Monday the top
+five go up a rung; in a board of ten or more the bottom five go down; nobody with zero
+points holds their place.
 
-A **league** is up to twenty people ranked on this week's points, and it has no server.
-Your standing is a *card* — one line of text carrying a random id, your nickname, your
-points and your medals. Send it to friends on any app you already use; they share it back
-into Cashfluent, or paste it. The board starts again every Monday. Nothing about you is
-stored anywhere but on your phone and in the message you chose to send, and the app still
-has no `INTERNET` permission. It is an honour system, like a scoreboard on paper: the
-checksum catches a mangled paste, it does not stop a friend typing themselves a bigger
-number.
+Today the board is built from *cards*: one line of text carrying a random id, a nickname,
+points and rung, sent to friends through any app you already use and pasted back in. That
+keeps the app entirely offline. An online league — weekly groups of twenty assigned
+automatically, no sharing by hand — is the next step, and the trade-off is written down in
+**[BACKLOG.md](BACKLOG.md)**.
 
 ## Status
 
-The app is complete and building. Ten lessons, ten simulators, ten games, a league, six
-screens.
+The app is complete and building. Ten lessons, ten simulators, sixty games, a league,
+seven screens.
 
 - [x] Gradle build, Android manifest, resources
 - [x] Design system — semantic colour, type scale, light and dark
-- [x] Local persistence (DataStore) for progress and settings
+- [x] Local persistence (DataStore) for progress, settings, points and league
 - [x] Financial engine — ten calculators, 82 unit tests
 - [x] All ten modules of content, with a content integrity test
 - [x] Home, module, settings and about screens
 - [x] Ten interactive simulators with hand-drawn charts
 - [x] Bundled Archivo and IBM Plex Mono, static weights, no runtime download
-- [x] Ten games, one per lesson, scored against the calculators — 14 tests
-- [x] Points, medals, and a league of up to twenty with no server — 12 tests
-- [ ] Accessibility pass on a real device at 200% text size
+- [x] Sixty mini-games in their own section, scored against the calculators — 12 tests
+- [x] Points, the weekly board, and the eight-rung ladder with its rules — 19 tests
+- [ ] Online league with weekly groups assigned automatically — decision pending, see BACKLOG
+- [ ] Accessibility pass on a real device with TalkBack (layout at 200% text checked)
 - [ ] App icon — currently a marked placeholder
 
 Everything still to do, and every decision taken so far, is in
@@ -102,11 +104,11 @@ Requires Android Studio (Ladybug or newer) and JDK 17.
 
 ```bash
 ./gradlew assembleDebug     # build
-./gradlew testDebugUnitTest # run the financial engine and content tests
+./gradlew testDebugUnitTest # run the financial engine, games, league and content tests
 ```
 
-Without the Android SDK you can still run the pure-Kotlin half — the ten calculators and
-the games, the league cards and the whole curriculum, 122 tests — on a plain JVM:
+Without the Android SDK you can still run the pure-Kotlin half — the ten calculators,
+the sixty games, the league and the whole curriculum, 127 tests — on a plain JVM:
 
 ```bash
 cd tools/verify && gradle test
@@ -120,21 +122,23 @@ app/src/main/java/com/cashfluent/app/
 ├── data/            DataStore repositories — progress, settings, points and league
 ├── di/              a thirteen-line service locator, no DI framework
 ├── domain/finance/  the calculators: pure Kotlin, no Android imports
-├── domain/game/     the ten games, each built on one calculator
-├── domain/league/   the league card, its text form, and the board
-└── ui/              theme, navigation, screens, simulators, game, league
+├── domain/game/     the sixty mini-games, each built on one calculator
+├── domain/league/   cards, the board, the ladder and the rules of the week
+└── ui/              theme, navigation, screens, simulators, games, league
 tools/               development only, ships nothing — see tools/README.md
 ```
 
-The calculators carry no Android dependency on purpose, so the numbers on screen are
-covered by unit tests that run in about a second.
+The calculators carry no Android dependency on purpose, so the numbers on screen — in
+the lessons and in the games — are covered by unit tests that run in about a second.
 
 ## Deliberately absent
 
 No account. No ads. No tracking. **No `INTERNET` permission** — there is no server to send
 anything to, and the manifest is the proof. Everything works offline, which is the point:
 equity means the person with a cheap phone and unreliable wifi opens the same app. The
-league needs none of it either: a card is a message you send, not a request the app makes.
+league is the one feature that would gain from a server; if it goes online it will carry a
+nickname and points and nothing else, and this paragraph, the note in Settings and the
+About screen change with it.
 
 Material You dynamic colour is also off. Green means *what you keep* and clay means *what
 it costs you* throughout the app; letting the system swap those hues would delete the

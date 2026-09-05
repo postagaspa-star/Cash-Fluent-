@@ -15,69 +15,86 @@ Judged on **Social Impact 40% · Technical Execution 30% · Innovation 20% · De
 
 ## 1. Open — waiting on the product owner
 
+### The league goes online
+
+Built on 5 September: a league made of *cards* — one line of text per person, sent
+through any chat app and pasted back in — so the app could stay offline. The product
+owner's answer, the same day: being offline is not an argument for social impact, it is a
+block that stops the leaderboard being built properly, and the leaderboard is the
+gamification. The developer agrees; the "no INTERNET" line was inherited from this file's
+first version and repeated without being questioned. The lessons stay offline either way.
+
+What an online league buys: weekly groups of twenty assigned automatically, promotion and
+relegation that mean something, live updates, no sharing by hand. What it costs, and how
+each cost is handled:
+
+| Cost | Answer |
+|---|---|
+| Accounts and minors' data | Firebase **anonymous sign-in**: no email, no password, no sign-up screen. Stored: a random id, the nickname, points, rung. A one-paragraph privacy note. |
+| Money | Firebase **Spark plan, €0, no card**. Free limits: 50,000 reads and 20,000 writes a day, 1 GB. Ample for hundreds of players. |
+| A dependency during judging | Firestore on the free plan does not pause and does not need keeping alive. The lessons and games never depend on it. |
+| Cheating | Points are declared by the phone; rules can only bound them. Acceptable for a hackathon, and said plainly. |
+
+The Firebase CLI on the laptop is already logged in to the product owner's Google
+account, so the project can be created and configured from there. **Waiting on one
+thing: the OK to create a Firebase project on that account.** Then: `INTERNET`
+permission, anonymous auth, Firestore with rules, leagues formed by tier and week in
+groups of twenty, the board as a live query, and the cards retired.
+
 ### How the lessons are written
 
 > "in seguito parleremo di come rendere le lezioni intrattenenti e coinvolgenti con un
 > bel linguaggio"
 
-Raised by the product owner, not yet discussed. This is a pass over the copy of all ten
-lessons, not a structural change: the three blocks stay exactly as they are (§4).
+Raised by the product owner, to be discussed later. This is a pass over the copy of all
+ten lessons, not a structural change: the three blocks stay exactly as they are (§4).
 
-The developer's position, 5 September: the copy already reads well, and every number in
-it is pinned by a test, so a blind rewrite risks more than it gains. Better to agree what
+The developer's position: the copy already reads well, and every number in it is pinned
+by a test, so a blind rewrite risks more than it gains. Better to agree what
 "entertaining" means first — one persona carried through all ten lessons, more humour,
 shorter paragraphs, a running example — and then rewrite two lessons as a sample before
 touching the rest.
 
-## 2. Built on 5 September — the decisions of §2 as they stood, minus the server
+## 2. Built on 5 September
 
-**Mini-games — one per lesson, ten in total.** `domain/game/drill/`. A game is five
-rounds of that lesson's own formula on numbers the lesson never showed, scored against
-the calculator in `domain/finance/`, so a game can never disagree with the lesson that
-taught it. Two shapes of round only: set a number with a slider, or pick one of a few
-options. Every round ends with the calculation written out — that is the teaching; the
-score is what keeps you playing. Within 5% of the answer is full marks.
+**Games, as their own section.** `domain/game/games/`, sixty mini-games, six per topic,
+reachable from Home, from the end of every lesson and from the league. A mini-game is a
+minute long: four rounds, 100 points a round. Four mechanics — set a number with a
+slider, pick one of a few options, higher or lower, true or false. Every answer is
+computed by the calculator in `domain/finance/`, so a game can never disagree with the
+lesson on the same topic, and every round ends with the calculation written out. This
+replaced the first version's one five-round game per lesson, at the product owner's
+request: games are not a tail on a lesson, they are a section, and there are dozens.
 
-**Points.** Up to 100 a round, 500 a game. Every game played adds to your total and to
-this week's count; the best score per lesson earns a medal (bronze at 200, silver at
-350, gold at 450). Held on the phone, not against an account.
+**Points.** Per game, for the week and for all time. A best score per mini-game.
 
-**Leagues of up to 20 people, with no server.** This was the open question in the
-previous version of this file (Firebase and accounts, or local-only). What was built is
-neither: your standing is a *card* — one line of text carrying a random id, your
-nickname, your points and your medals. You send it to friends through any app you
-already use; they share it back into Cashfluent, or paste it. The board ranks everyone
-on this week's points and starts again on Monday. The app still has no `INTERNET`
-permission, no account and no privacy policy to write, and the strongest argument for
-the 40% category survives intact.
+**The ladder.** Eight rungs — Wood, Bronze, Silver, Gold, Ruby, Emerald, Diamond, Elite —
+and the weekly rules in `Promotion`: top five go up, in a board of ten or more the
+bottom five go down, nobody with zero points holds their place, nobody leaves Wood
+downwards or Elite upwards. Monday's verdict is shown once at the top of the board.
+This replaced per-lesson medals, at the product owner's request.
 
-Why this and not Firebase: an online league costs the no-data claim, a privacy policy,
-the handling of minors' data before 1 October, a sign-up screen in front of a judge who
-has five minutes, and a live dependency that can fail during judging. What it buys is
-automatic updates — which a class group chat provides for free. The honest limit: a card
-is an honour system, like a scoreboard on paper. The checksum catches a mangled paste; it
-does not stop a friend typing themselves a bigger number.
-
-**Account creation with terms and conditions.** Not built, and no longer needed: there is
-nothing to create an account for.
+**The card league (interim).** Twenty people at most, ranked on this week's points, built
+from cards pasted in. It carries the ladder and the zones already, so the online version
+changes where the board comes from, not what it shows.
 
 ## 3. Still to do before submission
 
-- [ ] **Accessibility pass on a real device** — 200% text size, TalkBack end to end. The
-      roles and selected states went in on 5 September; nothing has been tested by ear.
+- [ ] **Online league** — see §1; blocked on the OK to create the Firebase project.
+- [ ] **Accessibility pass with TalkBack**, by ear. Layout at 200% text was checked on a
+      real phone on 5 September and holds; roles and selected states are in place.
 - [ ] **App icon.** The current one is a marked placeholder. *Product owner's job, not
       the developer's — explicitly.*
 - [x] **Make the repository public** — done 5 September. Keep it so: the install path in
       the README goes through Actions artifacts and GitHub releases, and neither is
       visible to a judge on a private repository.
 - [ ] **Devpost page.**
-- [ ] **Demo video, 5 minutes or under.** Show a card going from one phone to another
-      through a chat: it is the one thing a judge cannot try alone.
+- [ ] **Demo video, 5 minutes or under.** Lesson → game → board, in that order.
 - [ ] **Refresh the Copy Deck artifact.** It still carries the six original lesson titles
       from before the retitling and the expansion to ten. It is currently wrong.
 - [ ] **Re-render the artboards in `tools/design/`** for the screens that have changed
       since they were drawn. `Main` is current; the rest predate the ten-lesson list, and
-      none of them know about the game or the league.
+      none of them know about the games or the league.
 
 ## 4. Settled — do not reopen
 
@@ -96,14 +113,14 @@ real formulas and real cases — not a simplified one.
 **Everything unlocked by default**, with an opt-in linear path in Settings. This is the
 inverse of a "judging mode": the app does not hide anything and says why.
 
-**Local only.** Progress, settings, points, medals and friends' cards in DataStore, on
-the device, and nothing else anywhere.
+**Lessons, progress and settings are local and stay local**, whatever the league does.
 
-**Leagues have no server.** A league is the cards on your phone. If that ever changes,
-the privacy note in Settings, the About screen and the README all change with it.
+**Games are a section, not a tail.** Dozens of mini-games on the lessons' topics, each a
+minute long, each scored against the calculator behind the topic. No answer key is ever
+typed by hand.
 
-**Games score against the calculators.** A round's answer is computed by the same code
-the lesson's worked example was pinned to. No answer key is ever typed by hand.
+**The ladder is Duolingo's shape.** Wood to Elite in eight rungs, weekly, top five up,
+bottom five down. Points are 100 a round.
 
 **Currency is a symbol, never a conversion.** Content is written with `{c}` where a
 symbol belongs; `Module.inCurrency()` replaces it once, at the screen boundary. Example
@@ -141,11 +158,15 @@ the Gradle plugin portal, Google Fonts and raw.githubusercontent.com *are* reach
 `local.properties` must use forward slashes — `sdk.dir=C:/Users/.../Android/Sdk` —
 because a Java properties file eats single backslashes and Gradle then fails with
 "Invalid file path". `gradlew.bat testDebugUnitTest assembleDebug` takes about three
-minutes.
+minutes. The exit code after a pipe is not the build's: look for `BUILD SUCCESSFUL`.
+
+**The test phone locks itself.** Motorola Edge 50 Fusion, Android 16. adb works once USB
+debugging is authorised, but the pattern lock comes back whenever the screen goes off,
+and only the owner can clear it. Ask, then move fast.
 
 **`tools/verify/` runs the pure-Kotlin half locally** — the calculators, the games, the
-league cards and the whole curriculum, no Android SDK needed. Use it before every push;
-CI is for the Compose half. See `tools/README.md`.
+league and the whole curriculum, no Android SDK needed. Use it before every push; CI is
+for the Compose half. See `tools/README.md`.
 
 **Do not change the git remote in the container.** The repository was renamed to
 `Cash-Fluent-`, but the container's remote must stay
@@ -171,8 +192,10 @@ see `LeagueCards.decode`. Nothing else enters the app from outside.
 
 **Semantic colour, and it means something.** Green is what you keep, clay is what it
 costs you, brass is where to look next. Material You dynamic colour is deliberately off:
-a phone's wallpaper must not be able to recolour a chart whose colours carry meaning.
-Medals borrow from the same palette: gold is brass, silver the quiet grey, bronze the clay.
+a phone's wallpaper must not be able to recolour a chart whose colours carry meaning. The
+ladder borrows from the palette where it can — bronze is the clay, gold the brass,
+emerald the green — and adds two hues, ruby and diamond, that appear on tier badges and
+nowhere else.
 
 **Verify every number in Python before it becomes copy, then pin it as a test
 expectation.** That is why the worked examples and the calculators cannot drift apart.
