@@ -8,9 +8,9 @@ import com.cashfluent.app.data.model.GameOutcome
 import com.cashfluent.app.di.ServiceLocator
 import com.cashfluent.app.domain.finance.Currency
 import com.cashfluent.app.domain.game.ChoiceRound
-import com.cashfluent.app.domain.game.Drills
 import com.cashfluent.app.domain.game.Game
-import com.cashfluent.app.domain.game.GameRules
+import com.cashfluent.app.domain.game.MiniGame
+import com.cashfluent.app.domain.game.MiniGames
 import com.cashfluent.app.domain.game.NumberRound
 import com.cashfluent.app.domain.game.Round
 import com.cashfluent.app.domain.game.Scoring
@@ -23,9 +23,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 data class GameState(
-    val module: Module? = null,
+    val miniGame: MiniGame? = null,
+    val topic: Module? = null,
     val game: Game? = null,
     val index: Int = 0,
     val guess: Double = 0.0,
@@ -37,10 +39,12 @@ data class GameState(
     val best: Int = 0,
 ) {
     val round: Round? get() = game?.rounds?.getOrNull(index)
+    val roundCount: Int get() = miniGame?.rounds ?: 0
+    val maxScore: Int get() = miniGame?.maxScore ?: 0
     val total: Int get() = points.sum()
     val lastPoints: Int get() = points.lastOrNull() ?: 0
     val canLockIn: Boolean get() = round is NumberRound || picked != null
-    val isLastRound: Boolean get() = index >= GameRules.ROUNDS - 1
+    val isLastRound: Boolean get() = index >= roundCount - 1
 }
 
 /**
@@ -60,24 +64,31 @@ class GameViewModel : ViewModel() {
         .map { it.currency }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Currency.DEFAULT)
 
-    /** Deals a game for [moduleId]; asking again for the same lesson keeps the one in play. */
-    fun start(moduleId: String) {
-        if (_state.value.module?.id == moduleId) return
-        deal(moduleId)
+    /** Deals [gameId]; asking again for the same game keeps the one in play. */
+    fun start(gameId: String) {
+        if (_state.value.miniGame?.id == gameId) return
+        deal(gameId)
     }
 
     fun playAgain() {
-        val id = _state.value.module?.id ?: return
+        val id = _state.value.miniGame?.id ?: return
         deal(id)
     }
 
-    private fun deal(moduleId: String) {
-        val module = Modules.byId(moduleId) ?: return
-        val drill = Drills.forModule(moduleId) ?: return
-        val game = drill.game(seed = System.nanoTime())
-        _state.value = GameState(module = module, game = game, guess = startingGuess(game.rounds.first()))
+    /** A different game, picked at random. Returns its id so the screen can navigate. */
+    fun anotherGameId(): String = MiniGames.random(Random(System.nanoTime()), _state.value.miniGame?.id).id
+
+    private fun deal(gameId: String) {
+        val miniGame = MiniGames.byId(gameId) ?: return
+        val game = miniGame.game(seed = System.nanoTime())
+        _state.value = GameState(
+            miniGame = miniGame,
+            topic = Modules.byId(miniGame.topicId),
+            game = game,
+            guess = startingGuess(game.rounds.first()),
+        )
         viewModelScope.launch {
-            val best = playerRepository.player.first().bestFor(moduleId)
+            val best = playerRepository.player.first().bestFor(gameId)
             _state.update { it.copy(best = best) }
         }
     }
@@ -125,7 +136,7 @@ class GameViewModel : ViewModel() {
     private fun finish(current: GameState) {
         _state.value = current.copy(finished = true)
         viewModelScope.launch {
-            val outcome = playerRepository.recordGame(current.module!!.id, current.total)
+            val outcome = playerRepository.recordGame(current.miniGame!!.id, current.total)
             _state.update { it.copy(outcome = outcome, best = outcome.best) }
         }
     }

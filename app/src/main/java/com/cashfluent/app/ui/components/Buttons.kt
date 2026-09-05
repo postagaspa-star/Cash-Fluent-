@@ -14,8 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.cashfluent.app.content.UiStrings
-import com.cashfluent.app.domain.game.Medal
+import com.cashfluent.app.domain.league.Tier
 import com.cashfluent.app.ui.theme.CashfluentTheme
 
 /** The one filled button on a screen. Green, because pressing it is what you keep. */
@@ -59,22 +58,27 @@ fun TextAction(text: String, onClick: () -> Unit, modifier: Modifier = Modifier)
 }
 
 /**
- * Medal colours borrow from the palette rather than adding to it: gold is the brass
- * already used for "where to look next", silver is the quiet grey, bronze the warm clay.
+ * The rungs borrow from the palette where they can — bronze is the clay, gold the brass,
+ * emerald the green of what you keep — and use the two hues that exist only for this,
+ * ruby and diamond, where they cannot. Elite is ink on paper, reversed.
  */
 @Composable
-fun medalColors(medal: Medal): Pair<Color, Color> {
+fun tierColors(tier: Tier): Pair<Color, Color> {
     val colors = CashfluentTheme.colors
-    return when (medal) {
-        Medal.GOLD -> colors.goldInk to colors.goldSoft
-        Medal.SILVER -> colors.inkSecondary to colors.surfaceAlt
-        Medal.BRONZE -> colors.costInk to colors.costSoft
-        Medal.NONE -> colors.muted to colors.surfaceAlt
+    return when (tier) {
+        Tier.WOOD -> colors.inkSecondary to colors.surfaceAlt
+        Tier.BRONZE -> colors.costInk to colors.costSoft
+        Tier.SILVER -> colors.ink to colors.lineStrong
+        Tier.GOLD -> colors.goldInk to colors.goldSoft
+        Tier.RUBY -> colors.ruby to colors.rubySoft
+        Tier.EMERALD -> colors.growInk to colors.growSoft
+        Tier.DIAMOND -> colors.diamond to colors.diamondSoft
+        Tier.ELITE -> colors.paper to colors.ink
     }
 }
 
 @Composable
-fun MedalPill(medal: Medal, modifier: Modifier = Modifier) {
-    val (foreground, background) = medalColors(medal)
-    Pill(UiStrings.medalName(medal).lowercase(), foreground, background, modifier)
+fun TierBadge(tier: Tier, modifier: Modifier = Modifier) {
+    val (foreground, background) = tierColors(tier)
+    Pill(tier.label, foreground, background, modifier)
 }

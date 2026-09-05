@@ -2,16 +2,15 @@ package com.cashfluent.app.ui.league
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cashfluent.app.content.Module
-import com.cashfluent.app.content.Modules
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.data.model.Player
 import com.cashfluent.app.di.ServiceLocator
-import com.cashfluent.app.domain.game.Medal
 import com.cashfluent.app.domain.league.League
 import com.cashfluent.app.domain.league.LeagueCards
+import com.cashfluent.app.domain.league.Movement
 import com.cashfluent.app.domain.league.Standing
 import com.cashfluent.app.domain.league.Week
+import com.cashfluent.app.domain.league.WeekOutcome
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,13 +18,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class LessonMedal(val module: Module, val medal: Medal, val best: Int)
-
 data class LeagueState(
     val player: Player = Player(),
     val standings: List<Standing> = emptyList(),
-    val lessons: List<LessonMedal> = emptyList(),
     val message: String? = null,
+    /** Last week's verdict, if there is one worth saying. */
+    val outcome: WeekOutcome? = null,
 ) {
     val alone: Boolean get() = standings.size <= 1
 }
@@ -37,8 +35,8 @@ class LeagueViewModel : ViewModel() {
     private val message = MutableStateFlow<String?>(null)
 
     init {
-        // The card needs an id before it can be shared; mint it the first time anyone looks.
-        viewModelScope.launch { playerRepository.ensureId() }
+        // Mint the id and close a finished week the first time anyone looks at the board.
+        viewModelScope.launch { playerRepository.settle() }
     }
 
     val state: StateFlow<LeagueState> = combine(
@@ -46,12 +44,11 @@ class LeagueViewModel : ViewModel() {
         playerRepository.lastImport,
         message,
     ) { player, imported, own ->
-        val you = player.card(Modules.coreIds)
         LeagueState(
             player = player,
-            standings = League.standings(you, player.friends, Week.index()),
-            lessons = Modules.all.map { LessonMedal(it, player.medalFor(it.id), player.bestFor(it.id)) },
+            standings = League.standings(player.card, player.friends, Week.index(), player.tier),
             message = own ?: imported?.let(UiStrings::imported),
+            outcome = player.lastOutcome?.takeIf { it.movement != Movement.STAYED || it.weekPoints > 0 },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LeagueState())
 
@@ -80,9 +77,13 @@ class LeagueViewModel : ViewModel() {
         playerRepository.clearLastImport()
     }
 
+    fun dismissOutcome() {
+        viewModelScope.launch { playerRepository.dismissOutcome() }
+    }
+
     /** The text to hand to another app: a line for people, and the card for the phone. */
     suspend fun shareText(): String {
-        val card = playerRepository.myCard(Modules.coreIds)
+        val card = playerRepository.myCard()
         return UiStrings.shareText(card, LeagueCards.encode(card))
     }
 }

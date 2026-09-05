@@ -37,12 +37,9 @@ import com.cashfluent.app.content.Modules
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.content.inCurrency
 import com.cashfluent.app.domain.finance.Currency
-import com.cashfluent.app.domain.game.GameRules
-import com.cashfluent.app.domain.game.Medal
 import com.cashfluent.app.ui.components.BodyText
 import com.cashfluent.app.ui.components.Callout
 import com.cashfluent.app.ui.components.FormulaCard
-import com.cashfluent.app.ui.components.MedalPill
 import com.cashfluent.app.ui.components.NumberedStep
 import com.cashfluent.app.ui.components.Pill
 import com.cashfluent.app.ui.components.PrimaryButton
@@ -72,7 +69,7 @@ fun ModuleScreen(
     moduleId: String,
     onBack: () -> Unit,
     onOpenModule: (String) -> Unit,
-    onOpenGame: (String) -> Unit,
+    onOpenGames: (String) -> Unit,
     viewModel: ModuleViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -129,8 +126,7 @@ fun ModuleScreen(
                 item {
                     CompletionBlock(
                         module = module,
-                        best = state.best,
-                        onOpenGame = onOpenGame,
+                        onOpenGames = onOpenGames,
                         onOpenModule = onOpenModule,
                         onBack = onBack,
                     )
@@ -326,8 +322,7 @@ private fun CheckBlock(
 @Composable
 private fun CompletionBlock(
     module: Module,
-    best: Int,
-    onOpenGame: (String) -> Unit,
+    onOpenGames: (String) -> Unit,
     onOpenModule: (String) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -372,29 +367,14 @@ private fun CompletionBlock(
             )
         }
 
-        // The game: the same formula, on numbers the lesson never showed.
+        // The games on this topic: the same formula, on numbers the lesson never showed.
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            PrimaryButton(text = UiStrings.PLAY_GAME, onClick = { onOpenGame(module.id) })
-            if (best > 0) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = UiStrings.best(best, GameRules.MAX_SCORE),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.muted,
-                    )
-                    val medal = Medal.forScore(best)
-                    if (medal != Medal.NONE) MedalPill(medal)
-                }
-            } else {
-                Text(
-                    text = UiStrings.GAME_INTRO,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.muted,
-                )
-            }
+            PrimaryButton(text = UiStrings.GAMES_ON_TOPIC, onClick = { onOpenGames(module.id) })
+            Text(
+                text = UiStrings.GAMES_ON_TOPIC_SUB,
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.muted,
+            )
         }
 
         if (next != null) {

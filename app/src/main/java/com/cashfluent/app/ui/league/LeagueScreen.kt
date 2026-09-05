@@ -2,6 +2,7 @@ package com.cashfluent.app.ui.league
 
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,32 +45,36 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cashfluent.app.content.Tone
 import com.cashfluent.app.content.UiStrings
-import com.cashfluent.app.domain.game.GameRules
-import com.cashfluent.app.domain.game.Medal
 import com.cashfluent.app.domain.league.LeagueCards
+import com.cashfluent.app.domain.league.Movement
 import com.cashfluent.app.domain.league.Standing
+import com.cashfluent.app.domain.league.Tier
+import com.cashfluent.app.domain.league.Zone
 import com.cashfluent.app.ui.components.Callout
-import com.cashfluent.app.ui.components.MedalPill
 import com.cashfluent.app.ui.components.Pill
 import com.cashfluent.app.ui.components.PlainEnglishResult
 import com.cashfluent.app.ui.components.PrimaryButton
 import com.cashfluent.app.ui.components.ResultTile
 import com.cashfluent.app.ui.components.SectionHeader
 import com.cashfluent.app.ui.components.TextAction
+import com.cashfluent.app.ui.components.TierBadge
 import com.cashfluent.app.ui.components.TopBar
+import com.cashfluent.app.ui.components.tierColors
 import com.cashfluent.app.ui.theme.CashfluentTheme
 import com.cashfluent.app.ui.theme.CashfluentType
 import kotlinx.coroutines.launch
 
 /**
- * The board, your card, and the two things you can do with a card: send yours, paste
- * theirs. There is no server behind this screen, and it says so.
+ * The board for this week, the rung you are on, and the two things you can do with a
+ * card: send yours, paste theirs. Zones follow the rules in Promotion — top five up,
+ * bottom five down — and last Monday's verdict is said once at the top.
  */
 @Composable
 fun LeagueScreen(
     onBack: () -> Unit,
-    onOpenGame: (String) -> Unit,
+    onOpenGames: () -> Unit,
     viewModel: LeagueViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -77,6 +82,7 @@ fun LeagueScreen(
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
+    val (tierForeground, tierBackground) = tierColors(state.player.tier)
 
     Column(
         modifier = Modifier
@@ -91,11 +97,43 @@ fun LeagueScreen(
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            state.outcome?.let { outcome ->
+                item {
+                    PlainEnglishResult(
+                        text = "${UiStrings.outcomeBanner(outcome)} ${UiStrings.OUTCOME_DISMISS}.",
+                        tone = when (outcome.movement) {
+                            Movement.PROMOTED -> Tone.GOOD
+                            Movement.DEMOTED -> Tone.COST
+                            Movement.STAYED -> null
+                        },
+                        modifier = Modifier.clickable(role = Role.Button, onClick = viewModel::dismissOutcome),
+                    )
+                }
+            }
+
             item {
-                NameField(
-                    stored = state.player.name,
-                    onChange = viewModel::setName,
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(tierBackground, RoundedCornerShape(16.dp))
+                        .padding(20.dp),
+                ) {
+                    Text(
+                        text = UiStrings.leagueName(state.player.tier),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = tierForeground,
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = UiStrings.LEAGUE_RULES,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = tierForeground,
+                    )
+                }
+            }
+
+            item {
+                NameField(stored = state.player.name, onChange = viewModel::setName)
             }
 
             item {
@@ -104,7 +142,7 @@ fun LeagueScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     ResultTile(
-                        label = UiStrings.THIS_WEEK,
+                        label = UiStrings.WEEK_SHORT,
                         value = UiStrings.points(state.player.weekPoints),
                         valueColor = colors.grow,
                         modifier = Modifier.weight(1f),
@@ -115,8 +153,8 @@ fun LeagueScreen(
                         modifier = Modifier.weight(1f),
                     )
                     ResultTile(
-                        label = UiStrings.MEDALS,
-                        value = state.lessons.count { it.medal != Medal.NONE }.toString(),
+                        label = UiStrings.GAMES_PLAYED,
+                        value = state.player.gamesPlayed.toString(),
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -161,7 +199,18 @@ fun LeagueScreen(
                 }
             }
 
-            item { SectionHeader(UiStrings.THIS_WEEK) }
+            item {
+                SectionHeader(UiStrings.THIS_WEEK)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = "${UiStrings.ZONE_UP} ${UiStrings.ZONE_UP_DESC} · ${UiStrings.ZONE_DOWN} ${UiStrings.ZONE_DOWN_DESC}",
+                    style = CashfluentType.dataSmall,
+                    color = colors.muted,
+                    modifier = Modifier.clearAndSetSemantics {
+                        contentDescription = "${UiStrings.ZONE_UP_DESC}, ${UiStrings.ZONE_DOWN_DESC}"
+                    },
+                )
+            }
 
             items(state.standings, key = { it.card.id }) { standing ->
                 StandingRow(
@@ -190,11 +239,15 @@ fun LeagueScreen(
                 )
             }
 
-            item { SectionHeader(UiStrings.MEDALS, color = colors.goldInk) }
+            item { SectionHeader(UiStrings.LADDER, color = colors.goldInk) }
 
-            items(state.lessons, key = { it.module.id }) { lesson ->
-                LessonMedalRow(lesson = lesson, onClick = { onOpenGame(lesson.module.id) })
-                HorizontalDivider(color = colors.line)
+            items(Tier.entries.reversed(), key = { "tier-${it.name}" }) { tier ->
+                LadderRow(tier = tier, current = tier == state.player.tier)
+            }
+
+            item {
+                Spacer(Modifier.height(8.dp))
+                TextAction(text = UiStrings.ALL_GAMES, onClick = onOpenGames)
             }
         }
     }
@@ -241,6 +294,21 @@ private fun NameField(stored: String, onChange: (String) -> Unit) {
 private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
     val colors = CashfluentTheme.colors
     val card = standing.card
+    val zoneColor = when (standing.zone) {
+        Zone.PROMOTION -> colors.grow
+        Zone.DEMOTION -> colors.cost
+        Zone.SAFE -> colors.muted
+    }
+    val zoneMark = when (standing.zone) {
+        Zone.PROMOTION -> UiStrings.ZONE_UP
+        Zone.DEMOTION -> UiStrings.ZONE_DOWN
+        Zone.SAFE -> ""
+    }
+    val zoneDescription = when (standing.zone) {
+        Zone.PROMOTION -> UiStrings.ZONE_UP_DESC
+        Zone.DEMOTION -> UiStrings.ZONE_DOWN_DESC
+        Zone.SAFE -> ""
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -255,6 +323,14 @@ private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
             color = if (standing.position == 1) colors.goldInk else colors.muted,
             modifier = Modifier.width(24.dp),
         )
+        Text(
+            text = zoneMark,
+            style = CashfluentType.data,
+            color = zoneColor,
+            modifier = Modifier
+                .width(16.dp)
+                .semantics { contentDescription = zoneDescription },
+        )
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -268,8 +344,7 @@ private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
                 }
             }
             Text(
-                text = "${UiStrings.points(card.totalPoints)} ${UiStrings.ALL_TIME.lowercase()} · " +
-                    "${card.medalCount} ${UiStrings.MEDALS.lowercase()}",
+                text = "${UiStrings.points(card.totalPoints)} ${UiStrings.ALL_TIME.lowercase()}",
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.muted,
             )
@@ -298,38 +373,28 @@ private fun StandingRow(standing: Standing, onRemove: () -> Unit) {
     }
 }
 
+/** One rung, top of the ladder first. The one you are on is framed. */
 @Composable
-private fun LessonMedalRow(lesson: LessonMedal, onClick: () -> Unit) {
+private fun LadderRow(tier: Tier, current: Boolean) {
     val colors = CashfluentTheme.colors
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(vertical = 14.dp),
+            .then(if (current) Modifier.border(1.5.dp, colors.grow, RoundedCornerShape(10.dp)) else Modifier)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = lesson.module.displayNumber,
+            text = (Tier.entries.size - tier.ordinal).toString(),
             style = CashfluentType.dataSmall,
             color = colors.muted,
             modifier = Modifier.width(20.dp),
         )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = lesson.module.title, style = MaterialTheme.typography.bodyMedium, color = colors.ink)
-            if (lesson.best > 0) {
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = UiStrings.best(lesson.best, GameRules.MAX_SCORE),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.muted,
-                )
-            }
-        }
-        if (lesson.medal != Medal.NONE) {
-            MedalPill(lesson.medal)
-        } else {
-            Text(text = UiStrings.PLAY, style = MaterialTheme.typography.bodyMedium, color = colors.grow)
+        TierBadge(tier)
+        Spacer(Modifier.weight(1f))
+        if (current) {
+            Text(text = UiStrings.YOU_ARE_HERE, style = CashfluentType.dataSmall, color = colors.grow)
         }
     }
 }

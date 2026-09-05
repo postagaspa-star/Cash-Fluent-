@@ -9,7 +9,8 @@ import com.cashfluent.app.data.model.ModuleStatus
 import com.cashfluent.app.data.model.Player
 import com.cashfluent.app.data.model.Progress
 import com.cashfluent.app.di.ServiceLocator
-import com.cashfluent.app.domain.game.Medal
+import com.cashfluent.app.domain.game.MiniGames
+import com.cashfluent.app.domain.league.Tier
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,7 +23,6 @@ data class HomeModuleRow(
     val unlocked: Boolean,
     val isStartHere: Boolean,
     val lockedBehind: String?,
-    val medal: Medal,
 )
 
 data class HomeState(
@@ -32,6 +32,8 @@ data class HomeState(
     val showMethodCard: Boolean,
     val points: Int,
     val weekPoints: Int,
+    val tier: Tier,
+    val gamesCount: Int,
 ) {
     val fraction: Float get() = if (total == 0) 0f else doneCount.toFloat() / total
 }
@@ -41,6 +43,11 @@ class HomeViewModel : ViewModel() {
     private val progressRepository = ServiceLocator.progressRepository
     private val settingsRepository = ServiceLocator.settingsRepository
     private val playerRepository = ServiceLocator.playerRepository
+
+    init {
+        // Home is the first screen anyone sees on a Monday, so this is where a week closes.
+        viewModelScope.launch { playerRepository.settle() }
+    }
 
     val state: StateFlow<HomeState> =
         combine(progressRepository.progress, settingsRepository.settings, playerRepository.player, ::buildState)
@@ -66,7 +73,6 @@ class HomeViewModel : ViewModel() {
                     unlocked = unlocked,
                     isStartHere = module.id == startHere && unlocked,
                     lockedBehind = if (unlocked) null else previousNumberOf(module),
-                    medal = player.medalFor(module.id),
                 )
             }
             return HomeState(
@@ -76,6 +82,8 @@ class HomeViewModel : ViewModel() {
                 showMethodCard = !settings.methodCardDismissed,
                 points = player.totalPoints,
                 weekPoints = player.weekPoints,
+                tier = player.tier,
+                gamesCount = MiniGames.all.size,
             )
         }
 

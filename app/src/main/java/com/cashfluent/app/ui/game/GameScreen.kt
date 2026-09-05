@@ -29,19 +29,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.cashfluent.app.content.Module
 import com.cashfluent.app.content.Tone
 import com.cashfluent.app.content.UiStrings
 import com.cashfluent.app.domain.finance.Currency
 import com.cashfluent.app.domain.finance.Money
 import com.cashfluent.app.domain.game.ChoiceRound
-import com.cashfluent.app.domain.game.GameRules
 import com.cashfluent.app.domain.game.NumberRound
 import com.cashfluent.app.domain.game.Quantity
 import com.cashfluent.app.domain.game.Scoring
 import com.cashfluent.app.ui.components.Callout
 import com.cashfluent.app.ui.components.LabeledSlider
-import com.cashfluent.app.ui.components.MedalPill
 import com.cashfluent.app.ui.components.Pill
 import com.cashfluent.app.ui.components.PlainEnglishResult
 import com.cashfluent.app.ui.components.PrimaryButton
@@ -57,22 +54,24 @@ import com.cashfluent.app.ui.theme.CashfluentType
 import kotlin.math.roundToInt
 
 /**
- * Five rounds of one lesson's formula. Every round ends the same way: your number
- * next to the real one, the points, and the calculation written out — the reveal is
- * the teaching, the score is just what keeps you playing.
+ * One mini-game: a handful of rounds of one formula. Every round ends the same way —
+ * your number next to the real one, the points, and the calculation written out. The
+ * reveal is the teaching; the score is what keeps you playing.
  */
 @Composable
 fun GameScreen(
-    moduleId: String,
+    gameId: String,
     onBack: () -> Unit,
+    onOpenGame: (String) -> Unit,
+    onOpenGames: () -> Unit,
     onOpenLeague: () -> Unit,
     viewModel: GameViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
-    LaunchedEffect(moduleId) { viewModel.start(moduleId) }
+    LaunchedEffect(gameId) { viewModel.start(gameId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val currency by viewModel.currency.collectAsStateWithLifecycle()
-    val module = state.module
+    val miniGame = state.miniGame
 
     Column(
         modifier = Modifier
@@ -80,12 +79,9 @@ fun GameScreen(
             .background(colors.paper)
             .safeDrawingPadding(),
     ) {
-        TopBar(
-            title = if (module == null) "" else "${UiStrings.GAME} · ${module.displayNumber} ${module.title}",
-            onBack = onBack,
-        )
+        TopBar(title = miniGame?.title ?: "", onBack = onBack)
 
-        if (module == null || state.game == null) return@Column
+        if (miniGame == null || state.game == null) return@Column
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -96,9 +92,9 @@ fun GameScreen(
                 item {
                     ScoreBlock(
                         state = state,
-                        module = module,
                         onPlayAgain = viewModel::playAgain,
-                        onBack = onBack,
+                        onAnother = { onOpenGame(viewModel.anotherGameId()) },
+                        onOpenGames = onOpenGames,
                         onOpenLeague = onOpenLeague,
                     )
                 }
@@ -109,8 +105,17 @@ fun GameScreen(
 
             item {
                 Column {
+                    val topic = state.topic
+                    if (topic != null) {
+                        Text(
+                            text = "${topic.displayNumber} · ${topic.title} · ${miniGame.mechanic.label}",
+                            style = CashfluentType.dataSmall,
+                            color = colors.muted,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
                     Row(verticalAlignment = Alignment.Bottom) {
-                        SubLabel(UiStrings.round(state.index + 1, GameRules.ROUNDS), modifier = Modifier.weight(1f))
+                        SubLabel(UiStrings.round(state.index + 1, state.roundCount), modifier = Modifier.weight(1f))
                         Text(
                             text = UiStrings.pointsSoFar(state.total),
                             style = CashfluentType.dataSmall,
@@ -118,7 +123,7 @@ fun GameScreen(
                         )
                     }
                     Spacer(Modifier.height(10.dp))
-                    SectionProgress(reached = state.points.size, total = GameRules.ROUNDS)
+                    SectionProgress(reached = state.points.size, total = state.roundCount)
                 }
             }
 
@@ -192,7 +197,7 @@ fun GameScreen(
     }
 }
 
-/** How a quantity reads on screen. The drill picked the kind; the currency is the reader's. */
+/** How a quantity reads on screen. The recipe picked the kind; the currency is the reader's. */
 fun Quantity.format(value: Double, currency: Currency): String = when (this) {
     Quantity.AMOUNT -> Money.amount(value, currency)
     Quantity.AMOUNT_CENTS -> Money.preciseAmount(value, currency)
@@ -316,9 +321,9 @@ private fun ChoiceInput(
 @Composable
 private fun ScoreBlock(
     state: GameState,
-    module: Module,
     onPlayAgain: () -> Unit,
-    onBack: () -> Unit,
+    onAnother: () -> Unit,
+    onOpenGames: () -> Unit,
     onOpenLeague: () -> Unit,
 ) {
     val colors = CashfluentTheme.colors
@@ -331,16 +336,18 @@ private fun ScoreBlock(
             style = MaterialTheme.typography.titleLarge,
             color = colors.grow,
         )
-        Text(
-            text = module.title,
-            style = MaterialTheme.typography.bodyMedium,
-            color = colors.muted,
-        )
+        state.topic?.let { topic ->
+            Text(
+                text = "${state.miniGame?.title} · ${topic.title}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.muted,
+            )
+        }
 
         TotalStrip(
             label = UiStrings.SCORE,
-            value = UiStrings.outOf(state.total, GameRules.MAX_SCORE),
-            tone = if (state.total >= GameRules.MAX_SCORE / 2) Tone.GOOD else Tone.COST,
+            value = UiStrings.outOf(state.total, state.maxScore),
+            tone = if (state.total >= state.maxScore / 2) Tone.GOOD else Tone.COST,
         )
 
         Row(
@@ -349,41 +356,24 @@ private fun ScoreBlock(
         ) {
             ResultTile(
                 label = UiStrings.BEST,
-                value = UiStrings.outOf(best, GameRules.MAX_SCORE),
+                value = UiStrings.outOf(best, state.maxScore),
                 modifier = Modifier.weight(1f),
             )
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .background(colors.surface, RoundedCornerShape(12.dp))
-                    .border(1.dp, colors.line, RoundedCornerShape(12.dp))
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
-            ) {
-                Text(
-                    text = UiStrings.MEDAL.uppercase(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = colors.muted,
-                )
-                Spacer(Modifier.height(6.dp))
-                MedalPill(outcome?.medal ?: com.cashfluent.app.domain.game.Medal.forScore(best))
-            }
+            ResultTile(
+                label = UiStrings.WEEK_SHORT,
+                value = UiStrings.points(outcome?.weekPoints ?: state.total),
+                valueColor = colors.grow,
+                modifier = Modifier.weight(1f),
+            )
         }
 
-        if (outcome != null && (outcome.newBest || outcome.newMedal)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (outcome.newBest) Pill(UiStrings.NEW_BEST, colors.growInk, colors.growSoft)
-                if (outcome.newMedal) Pill("${UiStrings.NEW_MEDAL}: ${UiStrings.medalName(outcome.medal)}", colors.goldInk, colors.goldSoft)
-            }
+        if (outcome != null && outcome.newBest) {
+            Row { Pill(UiStrings.NEW_BEST, colors.growInk, colors.growSoft) }
         }
 
-        Text(
-            text = UiStrings.medalRule(),
-            style = MaterialTheme.typography.bodySmall,
-            color = colors.muted,
-        )
-
-        PrimaryButton(text = UiStrings.PLAY_AGAIN, onClick = onPlayAgain)
+        PrimaryButton(text = UiStrings.ANOTHER_GAME, onClick = onAnother)
+        TextAction(text = UiStrings.PLAY_AGAIN, onClick = onPlayAgain)
+        TextAction(text = UiStrings.ALL_GAMES, onClick = onOpenGames)
         TextAction(text = UiStrings.SEE_LEAGUE, onClick = onOpenLeague)
-        TextAction(text = UiStrings.BACK_TO_LESSON, onClick = onBack)
     }
 }
