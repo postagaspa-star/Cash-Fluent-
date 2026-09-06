@@ -109,14 +109,28 @@ costs you* — directly above a green "New best" pill; one tile in the games row
 inline without the border the two beside it have; and the three-tile rows went ragged at
 200% text because a wrapped label grew its tile past its neighbours.
 
-**Deferred: a bottom navigation bar** (Lessons · Games · League). Two of the three voted
-to ship it and all three ranked it below the line. The costs they found: no root screen
-uses a `Scaffold`, so all three handle their own window insets and a bar hosted outside
-the nav host double-pads against the gesture inset; the live numbers that justify the bar
-(`3/10 · 12/60 · 3rd`) are spread across three view models and rank is in none of them;
-and a permanent League tab advertises the app's emptiest surface as one third of the
-product while the board can still be empty. Worth revisiting after the video, the Devpost
-page and the icon, not before.
+**The bottom bar: deferred by the panel, then called for by the product owner, and
+built.** Two of the three voted to ship it and all three ranked it below the line, on
+three costs. Each was answered rather than argued with. The insets: the bar is a slot
+inside each root screen's own Column, under the list, so the one `safeDrawingPadding()`
+already there covers it and nothing double-pads. The live numbers that were supposed to
+justify it (`3/10 · 12/60 · 3rd`) live in three different view models and rank in none of
+them, so the bar carries none — four words and an underline. The empty League tab: it
+names a place that exists, and the screen behind it says plainly when there is no board
+yet. Four items, not three, at the product owner's call: Home, Games, League, Settings,
+which also took Settings out of the top corner of Home.
+
+The labels stop growing at 150% of the system text size. Four words have to fit across
+one phone, and a navigation bar reading "Settin…" is worse than one whose words stop a
+little short of everything else. Checked at 200%: all four fit on one line.
+
+**A lesson is five pages, not one scroll.** The product owner's call, the same day. The
+three blocks are untouched (§4); what changed is that each part fills the screen and is
+left deliberately: the bar at the top keeps its shape and now says which of the five you
+are on, a button in the bottom right goes to the next one, and Back steps through the
+parts before it leaves the lesson. The button sits under the text rather than floating
+over it, because a floating button covers the last two lines of every page — which is
+exactly where a paragraph ends.
 
 **Rejected: a week ring** — seven dots for days played. New persistence on `Player` for
 the 10% category, weeks from the deadline. Cut by all three on the second round.
@@ -133,7 +147,6 @@ the 10% category, weeks from the deadline. Cut by all three on the second round.
 - [x] **Make the repository public** — done 5 September. Keep it so: the install path in
       the README goes through Actions artifacts and GitHub releases, and neither is
       visible to a judge on a private repository.
-- [ ] **Bottom navigation bar**, if items above land early — see §2b for the costs found.
 - [ ] **Devpost page.**
 - [ ] **Demo video, 5 minutes or under.** Lesson → game → board, in that order.
 - [ ] **Refresh the Copy Deck artifact.** It still carries the six original lesson titles

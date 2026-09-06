@@ -52,8 +52,8 @@ import com.cashfluent.app.ui.theme.CashfluentType
 
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
     onOpenAbout: () -> Unit,
+    bottomBar: @Composable () -> Unit,
     viewModel: SettingsViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -66,10 +66,10 @@ fun SettingsScreen(
             .background(colors.paper)
             .safeDrawingPadding(),
     ) {
-        TopBar(title = UiStrings.SETTINGS, onBack = onBack)
+        TopBar(title = UiStrings.SETTINGS, onBack = null)
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp),
         ) {
             item {
@@ -167,16 +167,21 @@ fun SettingsScreen(
             }
 
             item {
-                Text(
-                    text = UiStrings.PRIVACY_NOTE,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.inkSecondary,
+                Column(
                     modifier = Modifier
                         .padding(top = 24.dp)
                         .fillMaxWidth()
                         .background(colors.surfaceAlt, RoundedCornerShape(12.dp))
                         .padding(16.dp),
-                )
+                ) {
+                    SectionLabel(UiStrings.PRIVACY_TITLE, color = colors.inkSecondary)
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = UiStrings.PRIVACY_NOTE,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.inkSecondary,
+                    )
+                }
             }
 
             item {
@@ -189,6 +194,8 @@ fun SettingsScreen(
                 )
             }
         }
+
+        bottomBar()
     }
 
     if (confirmingReset) {

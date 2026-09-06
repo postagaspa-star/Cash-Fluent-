@@ -29,8 +29,10 @@ Every module arrives in the same three blocks, always in this order:
 | **② The mechanism** | The real formula, with every symbol named and given an example value. |
 | **③ Real numbers** | A worked example with realistic figures, then the same calculation with *your* numbers. |
 
-Then a short check with an explanation of why the right answer is right, and one concrete
-thing to actually do this week.
+Each block is a page of its own, one part of the lesson filling the screen, with the bar
+at the top saying which of the five you are on and a button in the bottom right corner
+taking you to the next. Then a short check with an explanation of why the right answer is
+right, and one concrete thing to actually do this week.
 
 Ten modules, in reading order: budgeting, compound interest, good debt and bad debt,
 saving vs investing, shares and funds, gross vs net pay, buy now pay later, your credit
@@ -66,7 +68,8 @@ screen says so in one line, and nothing is lost.
 ## Status
 
 The app is complete and building. Ten lessons, ten simulators, sixty games, a league,
-seven screens.
+seven screens: four places along a bar at the bottom — home, games, league, settings —
+and three opened on top of them.
 
 - [x] Gradle build, Android manifest, resources
 - [x] Design system — semantic colour, type scale, light and dark

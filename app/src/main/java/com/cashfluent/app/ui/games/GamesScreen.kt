@@ -50,9 +50,9 @@ import com.cashfluent.app.ui.theme.CashfluentType
 @Composable
 fun GamesScreen(
     scrollToTopicId: String?,
-    onBack: () -> Unit,
     onOpenGame: (String) -> Unit,
     onOpenLeague: () -> Unit,
+    bottomBar: @Composable () -> Unit,
     viewModel: GamesViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -79,11 +79,11 @@ fun GamesScreen(
             .background(colors.paper)
             .safeDrawingPadding(),
     ) {
-        TopBar(title = UiStrings.GAMES, onBack = onBack)
+        TopBar(title = UiStrings.GAMES, onBack = null)
 
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 40.dp),
         ) {
             // The action first: this is a tab you open to play, not to read.
@@ -164,6 +164,8 @@ fun GamesScreen(
                 item(key = "gap-${section.module.id}") { Spacer(Modifier.height(28.dp)) }
             }
         }
+
+        bottomBar()
     }
 }
 
