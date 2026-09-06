@@ -13,6 +13,7 @@ import com.cashfluent.app.domain.league.WeekOutcome
 object UiStrings {
 
     const val APP_NAME = "Cashfluent"
+    const val HOME = "Home"
     const val TAGLINE = "The money class you never had."
 
     // Home
@@ -53,6 +54,7 @@ object UiStrings {
     const val STEP_BY_STEP = "Step by step"
     const val WATCH_OUT = "Watch out"
     const val REALITY_CHECK = "Reality check"
+    const val NEXT_PART = "Next →"
     const val RESET_EXAMPLE = "Reset to the example"
     const val MODULE_COMPLETE = "Module complete"
     const val TAKEAWAY = "Takeaway"
@@ -86,9 +88,12 @@ object UiStrings {
     const val GROUP_ABOUT = "About"
     const val ABOUT_TITLE = "Why Cashfluent exists"
     const val ABOUT_SUB = "The problem, the method, and what this app is not"
+    const val PRIVACY_TITLE = "What leaves this phone"
     const val PRIVACY_NOTE =
-        "No account, no ads, no tracking. Lessons, answers and settings never leave this phone. " +
-            "The league sends one line — your nickname and your points — and nothing else."
+        "A board has to tell players apart, so the league gives this phone a random id and sends " +
+            "it the nickname you chose and your two point totals. That is everything that leaves. " +
+            "No email, no password, no sign-up, no ads, no tracking. The lessons, every answer you " +
+            "type and your settings stay here."
     fun version(build: String) = "Cashfluent $build · GatewayHacks 2026"
 
     // Games — the catalogue

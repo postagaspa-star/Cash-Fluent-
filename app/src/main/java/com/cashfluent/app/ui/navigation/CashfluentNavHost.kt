@@ -15,18 +15,31 @@ import com.cashfluent.app.ui.league.LeagueScreen
 import com.cashfluent.app.ui.module.ModuleScreen
 import com.cashfluent.app.ui.settings.SettingsScreen
 
+/**
+ * Four places and three tasks.
+ *
+ * The places — home, the games, the board, the settings — carry the bar along the bottom
+ * and are always one tap from each other. The tasks — a lesson, a game round, the About
+ * page — are opened on top, keep their own back arrow, and show no bar: a lesson has its
+ * own way forward in the bottom right corner, and a game round should not have four
+ * tappable words beside the answer control.
+ */
 @Composable
 fun CashfluentNavHost(navController: NavHostController = rememberNavController()) {
+
+    fun bar(current: Section): @Composable () -> Unit = {
+        SectionBar(current = current, onSelect = { navController.select(it) })
+    }
 
     NavHost(navController = navController, startDestination = Destinations.HOME) {
 
         composable(Destinations.HOME) {
             HomeScreen(
                 onOpenModule = { id -> navController.open(Destinations.module(id)) },
-                onOpenSettings = { navController.open(Destinations.SETTINGS) },
                 onOpenAbout = { navController.open(Destinations.ABOUT) },
-                onOpenLeague = { navController.open(Destinations.LEAGUE) },
-                onOpenGames = { navController.open(Destinations.games()) },
+                onOpenLeague = { navController.select(Section.LEAGUE) },
+                onOpenGames = { navController.select(Section.GAMES) },
+                bottomBar = bar(Section.HOME),
             )
         }
 
@@ -61,9 +74,9 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
         ) { entry ->
             GamesScreen(
                 scrollToTopicId = entry.arguments?.getString(Destinations.TOPIC_ARG),
-                onBack = { navController.popBackStack() },
                 onOpenGame = { id -> navController.open(Destinations.game(id)) },
-                onOpenLeague = { navController.open(Destinations.LEAGUE) },
+                onOpenLeague = { navController.select(Section.LEAGUE) },
+                bottomBar = bar(Section.GAMES),
             )
         }
 
@@ -82,24 +95,19 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
                         launchSingleTop = true
                     }
                 },
-                onOpenGames = {
-                    navController.navigate(Destinations.games()) {
-                        popUpTo(Destinations.HOME)
-                        launchSingleTop = true
-                    }
-                },
-                onOpenLeague = { navController.open(Destinations.LEAGUE) },
+                onOpenGames = { navController.select(Section.GAMES) },
+                onOpenLeague = { navController.select(Section.LEAGUE) },
             )
         }
 
         composable(Destinations.LEAGUE) {
-            LeagueScreen(onBack = { navController.popBackStack() })
+            LeagueScreen(bottomBar = bar(Section.LEAGUE))
         }
 
         composable(Destinations.SETTINGS) {
             SettingsScreen(
-                onBack = { navController.popBackStack() },
                 onOpenAbout = { navController.open(Destinations.ABOUT) },
+                bottomBar = bar(Section.SETTINGS),
             )
         }
 
@@ -107,6 +115,17 @@ fun CashfluentNavHost(navController: NavHostController = rememberNavController()
             AboutScreen(onBack = { navController.popBackStack() })
         }
     }
+}
+
+/**
+ * Moving between the four places, rather than stacking them: each keeps its scroll
+ * position, only one copy of it is ever on the stack, and Back from any of them returns
+ * to home and then leaves the app.
+ */
+private fun NavHostController.select(section: Section) = navigate(section.route) {
+    popUpTo(graph.startDestinationId) { saveState = true }
+    launchSingleTop = true
+    restoreState = true
 }
 
 /**

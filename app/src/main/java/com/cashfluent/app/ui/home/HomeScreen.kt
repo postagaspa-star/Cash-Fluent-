@@ -60,10 +60,10 @@ import com.cashfluent.app.ui.theme.CashfluentType
 @Composable
 fun HomeScreen(
     onOpenModule: (String) -> Unit,
-    onOpenSettings: () -> Unit,
     onOpenAbout: () -> Unit,
     onOpenLeague: () -> Unit,
     onOpenGames: () -> Unit,
+    bottomBar: @Composable () -> Unit,
     viewModel: HomeViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -81,11 +81,10 @@ fun HomeScreen(
             total = state.total,
             fraction = state.fraction,
             onOpenAbout = onOpenAbout,
-            onOpenSettings = onOpenSettings,
         )
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 40.dp),
         ) {
             item {
@@ -134,6 +133,8 @@ fun HomeScreen(
                 )
             }
         }
+
+        bottomBar()
     }
 }
 
@@ -143,7 +144,6 @@ private fun Header(
     total: Int,
     fraction: Float,
     onOpenAbout: () -> Unit,
-    onOpenSettings: () -> Unit,
 ) {
     val colors = CashfluentTheme.colors
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -156,7 +156,6 @@ private fun Header(
                 Text("fluent", style = MaterialTheme.typography.titleLarge, color = colors.grow)
             }
             TopAction(text = "Why", onClick = onOpenAbout)
-            TopAction(text = UiStrings.SETTINGS, onClick = onOpenSettings)
         }
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp),

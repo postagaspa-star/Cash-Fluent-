@@ -1,9 +1,9 @@
 package com.cashfluent.app.ui.navigation
 
 /**
- * Seven destinations. Four for the lessons — a judge has five minutes, and every extra
- * screen is time taken from the content that earns the marks — plus the games section,
- * one game, and the league the games feed.
+ * Seven destinations, in two kinds. Four are places, reachable from the bar along the
+ * bottom of each other: home, the games, the league, the settings. Three are opened on
+ * top of them and hand themselves back: a lesson, one game, the About page.
  */
 object Destinations {
 

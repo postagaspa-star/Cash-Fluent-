@@ -68,7 +68,7 @@ import com.cashfluent.app.ui.theme.CashfluentType
  */
 @Composable
 fun LeagueScreen(
-    onBack: () -> Unit,
+    bottomBar: @Composable () -> Unit,
     viewModel: LeagueViewModel = viewModel(),
 ) {
     val colors = CashfluentTheme.colors
@@ -82,10 +82,10 @@ fun LeagueScreen(
             .background(colors.paper)
             .safeDrawingPadding(),
     ) {
-        TopBar(title = UiStrings.LEAGUE_TITLE, onBack = onBack)
+        TopBar(title = UiStrings.LEAGUE_TITLE, onBack = null)
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {

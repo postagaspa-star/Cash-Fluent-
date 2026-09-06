@@ -1,12 +1,12 @@
 package com.cashfluent.app.ui.module
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,17 +15,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -79,10 +80,15 @@ fun ModuleScreen(
     // remember to do it, and nothing below this line can forget.
     val module = state.module?.inCurrency(state.currency)
 
-    val listState = rememberLazyListState()
-    val reached by remember {
-        derivedStateOf { listState.firstVisibleItemIndex.coerceIn(0, SECTION_COUNT) }
-    }
+    // One part on screen at a time, and the bar at the top says which. A lesson used to be
+    // one long scroll: five sections of real teaching arrived as a single wall, and the
+    // only way to know how much was left was to keep going.
+    var page by rememberSaveable(moduleId) { mutableIntStateOf(0) }
+    val scroll = rememberScrollState()
+    LaunchedEffect(page) { scroll.scrollTo(0) }
+    // Back steps through the parts before it leaves the lesson, so a stray swipe does not
+    // throw away where you were.
+    BackHandler(enabled = page > 0) { page -= 1 }
 
     Column(
         modifier = Modifier
@@ -92,47 +98,83 @@ fun ModuleScreen(
     ) {
         TopBar(
             title = if (module == null) "" else "${module.displayNumber} · ${module.title}",
-            onBack = onBack,
+            onBack = { if (page > 0) page -= 1 else onBack() },
         )
         SectionProgress(
-            reached = reached,
+            reached = page + 1,
             total = SECTION_COUNT,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         )
 
         if (module == null) return@Column
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 40.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(scroll)
+                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(44.dp),
         ) {
-            item { Hero(module, state.showMethodCard, viewModel::dismissMethodCard) }
-            item { IdeaBlock(module) }
-            item { MechanismBlock(module, state.currency) }
-            item { RealNumbersBlock(module, state.currency) }
-            item { SimulatorPanel(kind = module.simulator, currency = state.currency) }
-            item {
-                CheckBlock(
-                    module = module,
-                    answers = state.answers,
-                    onAnswer = viewModel::answer,
-                )
-            }
-            // Added only once the check is complete. An empty item still gets the column's
-            // 44dp of spacing, which showed up as a blank band at the foot of every lesson.
-            if (state.allAnswered) {
-                item {
-                    CompletionBlock(
-                        module = module,
-                        onOpenGames = onOpenGames,
-                        onOpenModule = onOpenModule,
-                        onBack = onBack,
-                    )
-                }
+                when (page) {
+                    0 -> {
+                        Hero(module, state.showMethodCard, viewModel::dismissMethodCard)
+                        IdeaBlock(module)
+                    }
+                    1 -> MechanismBlock(module, state.currency)
+                    2 -> RealNumbersBlock(module, state.currency)
+                    3 -> SimulatorPanel(kind = module.simulator, currency = state.currency)
+                    else -> {
+                        CheckBlock(
+                            module = module,
+                            answers = state.answers,
+                            onAnswer = viewModel::answer,
+                        )
+                        if (state.allAnswered) {
+                            CompletionBlock(
+                                module = module,
+                                onOpenGames = onOpenGames,
+                                onOpenModule = onOpenModule,
+                                onBack = onBack,
+                            )
+                        }
+                    }
             }
         }
+
+        // The way on sits below the text rather than over it: a button that floats covers
+        // the last two lines of every page, which is exactly where a paragraph ends.
+        if (page < SECTION_COUNT - 1) {
+            HorizontalDivider(color = colors.line)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                NextPart(onClick = { page += 1 })
+            }
+        }
+    }
+}
+
+/** The way on, in the same corner on every part, over whatever is being read. */
+@Composable
+private fun NextPart(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = CashfluentTheme.colors
+    Box(
+        modifier = modifier
+            .heightIn(min = 52.dp)
+            .background(colors.grow, RoundedCornerShape(26.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 26.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = UiStrings.NEXT_PART,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.paper,
+        )
     }
 }
 
